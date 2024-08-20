@@ -8,3 +8,6 @@
 
 - Navbar
   - Add theming to drop-down.
+
+- Alerts
+  - try bottom of screen of possible
