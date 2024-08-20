@@ -23,7 +23,7 @@ const JobsTableRow = (job) => {
 				<td
 					onClick={handleTableRowClick}
 					className='min-w-[100px] max-w-[200px] cursor-pointer'>
-					<div className='font-bold'>{job.company}</div>
+					<div className='font-bold '>{job.company}</div>
 					<div className='font-light whitespace-nowrap overflow-hidden text-ellipsis'>
 						{job.position}
 					</div>

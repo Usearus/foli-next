@@ -69,7 +69,7 @@ const DatabaseProvider = ({ children }) => {
 
 	async function fetchAllQuestions() {
 		const { data, error } = await supabase.from('questions').select('*');
-		console.log('allQuestions are', data);
+		// console.log('allQuestions are', data);
 		setAllQuestions(data);
 		if (error) {
 			console.log(error);
@@ -88,6 +88,7 @@ const DatabaseProvider = ({ children }) => {
 	// *
 	// SET USER DATA
 	const [userProfile, setUserProfile] = useState([]);
+	const [userTheme, setUserTheme] = useState([]);
 	const [userJobs, setUserJobs] = useState([]);
 	const [userJobsArchived, setUserJobsArchived] = useState([]);
 	const [userPages, setUserPages] = useState([]);
@@ -112,8 +113,12 @@ const DatabaseProvider = ({ children }) => {
 				.single();
 			if (data) {
 				setUserProfile(data);
+				setUserTheme(data.theme);
+				document.documentElement.setAttribute('data-theme', data.theme);
+
 				setSettingPageStack(data.page_stack);
 				// console.log('userProfile is', data);
+				// console.log('user theme is', data.theme);
 			} else {
 				createUserProfile();
 				const onboardingJob1 = await createOnboardingJob1();
@@ -311,7 +316,7 @@ const DatabaseProvider = ({ children }) => {
 				.filter('account', 'eq', auth0Email);
 			if (data) {
 				setUserPages(data);
-				console.log('userPages are', data);
+				// console.log('userPages are', data);
 			}
 		}
 	}
@@ -338,7 +343,7 @@ const DatabaseProvider = ({ children }) => {
 				.filter('account', 'eq', auth0Email);
 			if (data) {
 				setUserSnippets(data);
-				console.log('userSnippets are', data);
+				// console.log('userSnippets are', data);
 			}
 		}
 	}
@@ -431,6 +436,8 @@ const DatabaseProvider = ({ children }) => {
 				allProfiles,
 				userProfile,
 				fetchUserProfile,
+				userTheme,
+				setUserTheme,
 				//Templates\
 				allTemplates,
 				setAllTemplates,

@@ -10,7 +10,7 @@ const Page = () => {
 	return (
 		<>
 			{/* Tabs component */}
-			<div className='p-0 pt-8 lg:p-16'>
+			<div className='p-0 pt-6 lg:p-12'>
 				<div role='tablist' className='tabs tabs-bordered'>
 					<input
 						type='radio'

@@ -5,11 +5,11 @@ import JobsTableRow from './JobsTableRow';
 const JobsTable = ({ jobs }) => {
 	return (
 		<>
-			<table className='table'>
+			<table className='table text-base-content'>
 				{/* Head */}
 				<thead>
 					<tr>
-						<th className='min-w-[100px] max-w-[200px]'>Job</th>
+						<th className='min-w-[100px] max-w-[200px] '>Job</th>
 						<th className='hidden lg:table-cell'>Salary</th>
 						<th className='hidden lg:table-cell'>Location</th>
 						<th className='hidden lg:table-cell'>Edited</th>
