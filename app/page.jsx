@@ -18,6 +18,7 @@ const Page = () => {
 						role='tab'
 						className='tab'
 						aria-label='Active'
+						defaultChecked
 					/>
 					<div role='tabpanel' className='tab-content pt-4'>
 						<JobsTable jobs={userJobs} />
@@ -29,7 +30,6 @@ const Page = () => {
 						role='tab'
 						className='tab'
 						aria-label='Archived'
-						defaultChecked
 					/>
 					<div role='tabpanel' className='tab-content pt-4'>
 						<JobsTable jobs={userJobsArchived} />
