@@ -24,7 +24,7 @@ const ThemeToggle = () => {
 			setAlert('Unable to update theme', 'error');
 			return;
 		}
-		setAlert('Theme updated', 'error');
+		setAlert('Theme updated', 'success');
 		setUserTheme(oppositeTheme);
 		document.documentElement.setAttribute('data-theme', oppositeTheme);
 		console.log('Theme successfully updated to:', oppositeTheme);

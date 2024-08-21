@@ -13,19 +13,16 @@ const NavBar = () => {
 
 	return (
 		<>
-			<header className='navbar bg-base-200 justify-between'>
+			<header className='navbar bg-base-200 justify-between text-base-content'>
 				<div>
-					<Link
-						href='/'
-						id='content'
-						className='btn btn-ghost text-lg text-base-content'>
+					<Link href='/' id='content' className='btn btn-ghost text-lg'>
 						foli
 					</Link>
 					{adminProfile ? (
-						<div className='navbar-center hidden lg:flex'>
+						<div className='navbar-center flex'>
 							<ul className='menu menu-horizontal px-1'>
 								<li>
-									<Link href='/test' id='content' class='text-base-content'>
+									<Link href='/test' id='content'>
 										Testing
 									</Link>
 								</li>
@@ -67,9 +64,7 @@ const NavBar = () => {
 							</div>
 						</div>
 					) : (
-						<a class='text-base-content' href='/api/auth/login'>
-							Login
-						</a>
+						<a href='/api/auth/login'>Login</a>
 					)}
 				</span>
 			</header>
