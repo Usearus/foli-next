@@ -4,9 +4,11 @@ import { useContext } from 'react';
 import { DatabaseContext } from '../context/DatabaseContext';
 import { supabase } from '../api/supabase';
 import { MoonIcon, SunIcon } from '@radix-ui/react-icons';
+import useAlert from '../alerts/useAlert';
 
 const ThemeToggle = () => {
 	const { userTheme, userProfile, setUserTheme } = useContext(DatabaseContext);
+	const { setAlert } = useAlert();
 
 	const handleThemeUpdate = async () => {
 		const oppositeTheme = userTheme === 'light' ? 'dark' : 'light';
@@ -19,12 +21,13 @@ const ThemeToggle = () => {
 
 		if (error) {
 			console.log('Error updating theme:', error);
+			setAlert('Unable to update theme', 'error');
 			return;
 		}
-
+		setAlert('Theme updated', 'error');
 		setUserTheme(oppositeTheme);
 		document.documentElement.setAttribute('data-theme', oppositeTheme);
-		// console.log('Theme successfully updated to:', oppositeTheme);
+		console.log('Theme successfully updated to:', oppositeTheme);
 	};
 
 	return (
