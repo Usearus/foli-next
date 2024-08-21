@@ -367,6 +367,19 @@ const DatabaseProvider = ({ children }) => {
 	const [currentJob, setCurrentJob] = useState([]);
 	const [selectedPageID, setSelectedPageID] = useState(null); // used to select a page to scroll to on page list
 
+	// Initialize state from localStorage
+	useEffect(() => {
+		const savedJob = localStorage.getItem('currentJob');
+		if (savedJob) {
+			setCurrentJob(JSON.parse(savedJob));
+		}
+
+		const savedPages = localStorage.getItem('currentPages');
+		if (savedPages) {
+			setCurrentPages(JSON.parse(savedPages));
+		}
+	}, []);
+
 	async function fetchCurrentJob(job) {
 		// console.log('job received for fetch:', job);
 		const { data } = await supabase
