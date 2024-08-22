@@ -48,6 +48,26 @@ const SinglePage = (page) => {
 	const [pageWidth, setPageWidth] = useState(page.width);
 	console.log(pageWidth);
 
+	useEffect(() => {
+		// Function to fetch and set the page width from the database
+		const fetchPageWidth = async () => {
+			try {
+				const { data, error } = await supabase
+					.from('pages')
+					.select('width')
+					.eq('id', page.id)
+					.single();
+
+				if (error) throw error;
+				setPageWidth(data.width); // Set the width from the database or fallback to '400px'
+			} catch (error) {
+				console.error('Error fetching page width:', error);
+			}
+		};
+
+		fetchPageWidth(); // Fetch width on component mount
+	}, [page.id]);
+
 	const handleUpdateWidthClick = async (newPageWidth) => {
 		console.log('Updating width to:', newPageWidth);
 		setPageWidth(newPageWidth);
@@ -210,12 +230,10 @@ const SinglePage = (page) => {
 						/>
 					)}
 				</form>
-				<button type='submit' className='btn btn-primary w-fit'>
-					Submit {`"${pageWidth}px"`}
-				</button>
-				<div style={{ width: pageWidth }}>
-					{' '}
-					Width is {`"${pageWidth}px"`} {page.width}
+				<div className='flex justify-end'>
+					<button type='submit' className='btn btn-outline btn-primary w-fit'>
+						Edit page
+					</button>
 				</div>
 			</div>
 		</Resizable>
