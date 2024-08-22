@@ -1,5 +1,6 @@
 import { Inter } from 'next/font/google';
 import './globals.css';
+import './quillStyles.css';
 import { DatabaseProvider } from './context/DatabaseContext';
 import NavBar from './components/NavBar';
 import { UserProvider } from '@auth0/nextjs-auth0/client';
