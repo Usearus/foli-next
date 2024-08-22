@@ -33,9 +33,9 @@ body {
 }
 
 .markdown-content {
-  /* * {
+   /* * {
     color: var(--secondaryTextColor);
-  } */
+  }  */
 /* 
   a {
     color: var(--primary-400);
@@ -74,6 +74,6 @@ body {
 }
 
 .page-scroll {
-  height: calc(100vh - 350px); /* 100vh minus the height of the navbar */
+  height: calc(100vh - 320px); /* 100vh minus the height of the navbar */
   overflow-y: auto;
 }

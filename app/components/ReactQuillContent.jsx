@@ -28,7 +28,7 @@ const ReactQuillContent = ({ value, onChange }) => {
 		toolbar: [
 			// [{ 'font': Font.whitelist }],
 			[{ header: [1, 2, false] }],
-			[{ size: fontSizeArr }],
+			// [{ size: fontSizeArr }],
 			['bold', 'italic', 'underline'],
 			[],
 			[{ align: [] }, { list: 'ordered' }, { list: 'bullet' }],
@@ -51,13 +51,3 @@ const ReactQuillContent = ({ value, onChange }) => {
 };
 
 export default ReactQuillContent;
-
-// <div
-// 				id='shared-toolbar'
-// 				className='bg-base-100 p-2 rounded-t-lg border-b border-base-200'>
-// 				{/* Add any custom toolbar buttons here */}
-// 				<button className='btn btn-primary btn-sm'>Bold</button>
-// 				<button className='btn btn-secondary btn-sm'>Italic</button>
-// 				<button className='btn btn-accent btn-sm'>Underline</button>
-// 				{/* Add more buttons as needed */}
-// 			</div>

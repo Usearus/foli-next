@@ -90,6 +90,7 @@ const SinglePage = (page) => {
 	const [editing, setEditing] = useState(false);
 	const handleEditClick = () => {
 		setEditing(true);
+		console.log('editing is now', editing);
 	};
 
 	const handleCancelClick = () => {
@@ -189,7 +190,7 @@ const SinglePage = (page) => {
 	// if (isMobile === false) {
 	return (
 		<Resizable
-			className={`${editing ? 'editing-content' : 'page-content'} shadow-on`}
+			// className={`${editing ? 'editing-content' : 'page-content'} shadow-on`}
 			enable={{
 				top: false,
 				right: true,
@@ -210,32 +211,68 @@ const SinglePage = (page) => {
 				height: '100%',
 				width: pageWidth,
 			}}>
-			<div
+			<article
 				className='bg-base-100 h-full p-4 flex flex-col gap-2'
 				style={{ width: pageWidth }}>
-				<label className='font-bold'>{page.title}</label>
-				<hr />
-				<form className='mt-4 flex flex-col items-end flex-grow'>
-					{editing ? (
-						<div className='page-scroll'>
-							<ReactQuillEditor
-								value={page.content}
-								onChange={handleEditorChange}
-							/>
+				<div className='flex justify-between'>
+					<label className='font-bold'>{page.title}</label>
+					<div className='dropdown dropdown-end'>
+						<div tabIndex={0} role='button' className='btn btn-xs btn-ghost '>
+							<DotsVerticalIcon />
 						</div>
-					) : (
+						<ul
+							tabIndex={0}
+							className='dropdown-content menu bg-base-200 rounded-box z-[1] w-52 p-2 shadow'>
+							<li>
+								<a>Edit</a>
+							</li>
+							<li>
+								<a>Delete</a>
+							</li>
+						</ul>
+					</div>
+				</div>
+				<hr />
+
+				{editing ? (
+					// Quill version
+					<div className='flex flex-col justify-between h-full'>
+						<div className='page-scroll'>
+							<ReactQuillEditor value={content} onChange={handleEditorChange} />
+						</div>
+						<div className='flex justify-end gap-2'>
+							<button
+								type='button'
+								className='btn btn-sm btn-ghost btn-primary w-fit'
+								onClick={handleCancelClick}>
+								Cancel
+							</button>
+							<button
+								type='button'
+								className='btn btn-sm btn-primary w-fit'
+								onClick={handleUpdateContentClick}>
+								Save page
+							</button>
+						</div>
+					</div>
+				) : (
+					// Markdown version
+					<div className='flex flex-col justify-between h-full'>
 						<MarkdownView
 							className='page-scroll markdown-content'
 							markdown={page.content}
 						/>
-					)}
-				</form>
-				<div className='flex justify-end'>
-					<button type='submit' className='btn btn-outline btn-primary w-fit'>
-						Edit page
-					</button>
-				</div>
-			</div>
+						<div className='flex justify-end'>
+							<button
+								type='button'
+								className='btn btn-sm btn-outline btn-primary w-fit'
+								onClick={handleEditClick}>
+								Edit page
+							</button>
+						</div>
+					</div>
+				)}
+			</article>
 		</Resizable>
 	);
 };

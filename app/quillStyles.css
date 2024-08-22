@@ -98,7 +98,7 @@
 
 /* This is the editor */
 .ql-editor {
-    font-size: 1rem !important;
+    font-size: 16px !important;
     /* flex-grow: 1 !important;
     min-height:0 !important;
     overflow-y: auto !important; */
