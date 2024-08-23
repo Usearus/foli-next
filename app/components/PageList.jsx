@@ -41,7 +41,7 @@ const PageList = () => {
 
 	if (visiblePages.length > 0) {
 		return (
-			<div className='flex gap-4 flex-grow h-full overflow-x-auto'>
+			<div className='flex gap-4 h-full overflow-x-auto'>
 				{visiblePages.map((page, index) => {
 					const ref = createRef();
 					pageRef.current[index] = { id: page.id, ref };
@@ -52,7 +52,7 @@ const PageList = () => {
 						<div
 							key={page.id}
 							style={{ scrollSnapAlign: 'center' }}
-							className={`h-full flex-grow ${pageClassName}`}
+							className={`h-full ${pageClassName}`}
 							ref={ref}>
 							<SinglePage key={page.id} id={page.id} {...page} />
 						</div>

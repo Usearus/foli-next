@@ -5,7 +5,7 @@ import { DatabaseContext } from '../context/DatabaseContext';
 import ReactQuillEditor from './ReactQuillEditor';
 import MarkdownView from 'react-showdown';
 import useAlert from '../alerts/useAlert';
-// import ModalDeleteConfirmation
+import ModalDeleteConfirmation from '../components/ModalDeleteConfirmation';
 import { DotsVerticalIcon, GearIcon, ExitIcon } from '@radix-ui/react-icons';
 // import ModalEditPage
 import { supabase } from '../api/supabase';
@@ -20,14 +20,6 @@ const SinglePage = (page) => {
 	const [selectedEventKey, setSelectedEventKey] = useState(null);
 	const [showDeleteModal, setShowDeleteModal] = useState(false);
 	const [showEditPageModal, setShowEditPageModal] = useState(false);
-
-	const handleSelect = (eventKey) => {
-		setSelectedEventKey(eventKey);
-		if (eventKey === '1') {
-			setShowDeleteModal(true);
-			console.log('handleSelect called');
-		}
-	};
 
 	const handleOpenPageModalClick = () => {
 		setShowEditPageModal(true);
@@ -90,7 +82,7 @@ const SinglePage = (page) => {
 	const [editing, setEditing] = useState(false);
 	const handleEditClick = () => {
 		setEditing(true);
-		console.log('editing is now', editing);
+		// console.log('editing is now', editing);
 	};
 
 	const handleCancelClick = () => {
@@ -227,7 +219,32 @@ const SinglePage = (page) => {
 								<a>Edit</a>
 							</li>
 							<li>
-								<a>Delete</a>
+								<a
+									onClick={() =>
+										document.getElementById('my_modal_3').showModal()
+									}>
+									Delete
+								</a>
+								<dialog
+									id='my_modal_3'
+									className='modal flex justify-center items-center'>
+									<div className='modal-box bg-base-200'>
+										<form method='dialog'>
+											<button className='btn btn-sm btn-circle btn-ghost absolute right-2 top-2'>
+												✕
+											</button>
+										</form>
+										<h3 className='font-bold text-lg'>Delete page</h3>
+										<p className='py-4'>
+											Are you sure you want to delete this page?
+										</p>
+										<div className='modal-action'>
+											<button className='btn btn-outline btn-error'>
+												Confirm delete
+											</button>
+										</div>
+									</div>
+								</dialog>
 							</li>
 						</ul>
 					</div>

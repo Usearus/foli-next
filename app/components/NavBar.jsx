@@ -5,21 +5,26 @@ import { useUser } from '@auth0/nextjs-auth0/client';
 import Link from 'next/link';
 import { useContext, useEffect } from 'react';
 import { DatabaseContext } from '../context/DatabaseContext';
-import ThemeToggle from './ThemeToggle';
 
 const NavBar = () => {
 	const { user } = useUser();
 	const { adminProfile } = useContext(DatabaseContext);
 
 	return (
-		<>
-			<header className='navbar bg-base-200 justify-between text-base-content'>
+		<div className='text-base-content'>
+			<div
+				className='navbar bg-base-200 justify-between 
+			border-b-2 border-base-100 
+			'>
+				{/* Left content */}
 				<div>
+					{/* Logo */}
 					<Link href='/' id='content' className='btn btn-ghost text-lg'>
 						foli
 					</Link>
+					{/* Test page */}
 					{adminProfile ? (
-						<div className='navbar-center flex'>
+						<div className='navbar-center hidden lg:flex'>
 							<ul className='menu menu-horizontal px-1'>
 								<li>
 									<Link href='/test' id='content'>
@@ -30,15 +35,16 @@ const NavBar = () => {
 						</div>
 					) : null}
 				</div>
-				<span className='flex gap-4 items-center'>
-					<ThemeToggle />
+
+				{/* Right content */}
+				<div className='flex-none'>
 					{/* Profile btn */}
-					{user ? (
-						<div className='dropdown dropdown-bottom dropdown-end'>
-							<div
-								tabIndex={0}
-								role='button'
-								className='btn btn-ghost btn-circle avatar'>
+					<div className='dropdown dropdown-end'>
+						<div
+							tabIndex={0}
+							role='button'
+							className='btn btn-ghost btn-circle avatar'>
+							{user ? (
 								<div className='w-10 rounded-full'>
 									<Image
 										src={user.picture}
@@ -47,28 +53,25 @@ const NavBar = () => {
 										height='40'
 									/>
 								</div>
-								{/* List of options */}
-								<ul
-									tabIndex={0}
-									className='menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow'>
-									<li>
-										<a>Profile</a>
-									</li>
-									<li>
-										<a>Settings</a>
-									</li>
-									<li>
-										<a href='/api/auth/logout'>Logout</a>
-									</li>
-								</ul>
-							</div>
+							) : null}
 						</div>
-					) : (
-						<a href='/api/auth/login'>Login</a>
-					)}
-				</span>
-			</header>
-		</>
+						<ul
+							tabIndex={0}
+							className='menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow'>
+							<li>
+								<Link href='/settings' id='content'>
+									Settings
+								</Link>
+							</li>
+							<li>
+								<a href='/api/auth/logout'>Logout</a>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+			{/* <div className='divider m-0 p-0'></div> */}
+		</div>
 	);
 };
 

@@ -18,7 +18,7 @@ const JobsTableRow = (job) => {
 
 	return (
 		<>
-			<tr key={job.id} className='hover'>
+			<tr key={job.id} className='hover:bg-base-100'>
 				{/* Job Cell */}
 				<td
 					onClick={handleTableRowClick}

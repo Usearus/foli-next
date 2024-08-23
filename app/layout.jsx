@@ -22,7 +22,7 @@ export default function RootLayout({ children }) {
 					<DatabaseProvider>
 						<AlertProvider>
 							{/* This is 'relative' so that the alert can be positioned 'absolute'. */}
-							<div className='flex flex-col h-screen bg-base-100 relative'>
+							<div className='flex flex-col h-screen bg-base-200 relative'>
 								<NavBar />
 								<AlertPopup />
 								{/* 'Overflow-y-auto' keeps the navbar fixed at the top. Flex-grow makes it take up all the space the navbar doesn't. */}

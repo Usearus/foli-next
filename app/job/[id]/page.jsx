@@ -1,12 +1,31 @@
 'use client';
-import { useContext } from 'react';
+import { useContext, useState, useEffect } from 'react';
 import { DatabaseContext } from '../../context/DatabaseContext';
 import SideBar from '../../components/SideBar';
 import TopBarJobDesktop from '../../components/TopBarJobDesktop';
 import PageList from '../../components/PageList';
+import Loader from '../../components/Loader';
 
 const JobPage = () => {
 	const { currentPages } = useContext(DatabaseContext);
+	const [isLoading, setIsLoading] = useState(true);
+
+	// Simulate loading
+	useEffect(() => {
+		// Assuming you have data loading or API calls here
+		// Set the loading state to false once everything is loaded
+		if (currentPages) {
+			setIsLoading(false);
+		}
+	}, [currentPages]);
+
+	if (isLoading) {
+		return (
+			<div className='flex justify-center items-center h-full'>
+				<Loader />
+			</div>
+		);
+	}
 
 	if (currentPages.length > 0) {
 		return (
