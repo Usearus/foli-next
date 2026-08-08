@@ -82,6 +82,8 @@ const DatabaseProvider = ({ children }) => {
 	const [settingPageStack, setSettingPageStack] = useState('');
 	const [userResume, setUserResume] = useState([]);
 	const [userSnippets, setUserSnippets] = useState([]);
+	const [userQuestions, setUserQuestions] = useState([]);
+	const [isQuestionsLoading, setIsQuestionsLoading] = useState(true);
 
 	// SET ADMIN DATA
 	const [adminProfile, setAdminProfile] = useState(false);
@@ -336,11 +338,25 @@ const DatabaseProvider = ({ children }) => {
 		}
 	}
 
+	async function fetchUserQuestions() {
+		const { data, error } = await supabase
+			.from('questions')
+			.select('*')
+			.order('id', { ascending: false });
+		if (data) {
+			setUserQuestions(data);
+		}
+		if (error) {
+			console.log(error);
+		}
+	}
+
 	useEffect(() => {
 		let cancelled = false;
 
 		async function loadUserData() {
 			setIsProfileLoading(true);
+			setIsQuestionsLoading(true);
 			try {
 				await fetchUserProfile();
 				await Promise.all([
@@ -349,10 +365,12 @@ const DatabaseProvider = ({ children }) => {
 					fetchUserPages(),
 					fetchUserResume(),
 					fetchUserSnippets(),
+					fetchUserQuestions(),
 				]);
 			} finally {
 				if (!cancelled) {
 					setIsProfileLoading(false);
+					setIsQuestionsLoading(false);
 				}
 			}
 		}
@@ -476,6 +494,9 @@ const DatabaseProvider = ({ children }) => {
 				// Questions
 				allQuestions,
 				fetchAllQuestions,
+				userQuestions,
+				fetchUserQuestions,
+				isQuestionsLoading,
 			}}>
 			{children}
 		</DatabaseContext.Provider>

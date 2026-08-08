@@ -161,6 +161,7 @@
 .page-sheet-enter .ql-toolbar.ql-snow,
 .page-sheet-enter .ql-snow.ql-toolbar {
     overflow: hidden;
+    transition: none;
     animation:
         quill-toolbar-fade-in-down var(--quill-edit-enter-duration) ease-out forwards,
         quill-toolbar-overflow-visible 0ms ease var(--quill-edit-enter-duration) forwards;
@@ -169,6 +170,7 @@
 .page-sheet-exit .ql-toolbar.ql-snow,
 .page-sheet-exit .ql-snow.ql-toolbar {
     overflow: hidden;
+    transition: none;
     animation: quill-toolbar-fade-out-up var(--quill-edit-enter-duration) ease-in forwards;
 }
 

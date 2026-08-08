@@ -6,12 +6,18 @@ import { DatabaseContext } from '../context/DatabaseContext';
 import { useFocusMode } from '../context/FocusModeContext';
 import dynamic from 'next/dynamic';
 
-const ReactQuillEditor = dynamic(() => import('./ReactQuillEditor'), { ssr: false });
+const ReactQuillEditor = dynamic(() => import('./ReactQuillEditor'), {
+	ssr: false,
+});
 import MarkdownView from 'react-showdown';
 import useAlert from '../alerts/useAlert';
 import DeletePageBtn from './DeletePageBtn';
 import FocusModeOverlay from './FocusModeOverlay';
-import { DotsVerticalIcon, EnterFullScreenIcon, Pencil1Icon } from '@radix-ui/react-icons';
+import {
+	DotsVerticalIcon,
+	EnterFullScreenIcon,
+	Pencil1Icon,
+} from '@radix-ui/react-icons';
 import { supabase } from '../api/supabase';
 import { Resizable } from 're-resizable';
 
@@ -21,7 +27,8 @@ const FOCUS_MODE_MAX_WIDTH = 700;
 const SinglePage = (page) => {
 	// Context Variables
 	const { fetchCurrentPages, currentJob } = useContext(DatabaseContext);
-	const { focusPageId, focusOrigin, enterFocusMode, exitFocusMode } = useFocusMode();
+	const { focusPageId, focusOrigin, enterFocusMode, exitFocusMode } =
+		useFocusMode();
 	const { setAlert } = useAlert();
 	const isFocusMode = focusPageId === page.id;
 	const sheetRef = useRef(null);
@@ -139,6 +146,10 @@ const SinglePage = (page) => {
 
 	const handleCancelClick = () => {
 		setContent(page.content);
+		if (titleRef.current) {
+			titleRef.current.value = page.title ?? '';
+			setCharacterCount((page.title ?? '').length);
+		}
 		setShowEditPageModal(false);
 		startExitEdit();
 	};
@@ -177,6 +188,10 @@ const SinglePage = (page) => {
 		const handleEscape = (event) => {
 			if (event.key === 'Escape') {
 				setContent(page.content);
+				if (titleRef.current) {
+					titleRef.current.value = page.title ?? '';
+					setCharacterCount((page.title ?? '').length);
+				}
 				setShowEditPageModal(false);
 				startExitEdit();
 			}
@@ -189,7 +204,16 @@ const SinglePage = (page) => {
 
 	// React Quill Editor Variables & Functions
 	const [content, setContent] = useState(page.content);
-	const [title] = useState(page.title);
+
+	// Editing title
+	const initialTitleValue = page.title ?? '';
+	const titleRef = useRef(null);
+	const titleMaxChar = 32;
+	const [characterCount, setCharacterCount] = useState(initialTitleValue.length);
+
+	const handleTitleChange = (event) => {
+		setCharacterCount(event.target.value.length);
+	};
 
 	const handleEditorChange = (value) => {
 		setContent(value);
@@ -221,7 +245,7 @@ const SinglePage = (page) => {
 			.from('pages')
 			.update({
 				content: content,
-				title: title,
+				title: titleRef.current?.value ?? page.title,
 			})
 			.eq('id', page.id);
 
@@ -242,47 +266,72 @@ const SinglePage = (page) => {
 	}
 
 	const sheetArticle = (
-		<article className='bg-base-100 h-full w-full p-4 flex flex-col gap-2 shadow-sm rounded-lg'>
-			<div className='flex justify-between'>
-				<label className='page-sheet-title font-bold pl-2'>{page.title}</label>
-				<div className='flex justify-end gap-2'>
-					{!editing && !isFocusMode ? (
-						<>
-							<button
-								type='button'
-								className='btn btn-xs btn-ghost'
-								onClick={handleFocusClick}
-								aria-label='Enter focus mode'>
-								<EnterFullScreenIcon />
-							</button>
-							<button
-								type='button'
-								className='btn btn-xs btn-ghost'
-								onClick={handleEditClick}
-								aria-label='Edit page'>
-								<Pencil1Icon />
-							</button>
-						</>
-					) : null}
-					{!page.locked && !isFocusMode ? (
-						<div className='dropdown dropdown-end'>
-							<div tabIndex={0} role='button' className='btn btn-xs btn-ghost'>
-								<DotsVerticalIcon />
-							</div>
-							<ul
-								tabIndex={0}
-								className='dropdown-content menu bg-base-200 rounded-box z-[1] w-52 p-2 shadow'>
-								<li>
-									<DeletePageBtn page={page} />
-								</li>
-							</ul>
-						</div>
-					) : null}
+		<article className='page-sheet-container bg-base-100 h-full w-full p-4 flex flex-col gap-2 shadow-sm'>
+			{editing ? (
+				<div className='flex justify-between pt-2'>
+					{page.locked ? (
+						<label className='page-sheet-title font-bold pl-4'>{page.title}</label>
+					) : (
+						<label className='input input-ghost input-xs flex grow items-center gap-2 mb-[2px] mr-2'>
+							<input
+								type='text'
+								required
+								ref={titleRef}
+								defaultValue={initialTitleValue}
+								maxLength={titleMaxChar}
+								onChange={handleTitleChange}
+								placeholder='Add page title'
+								className='grow font-bold text-xl pl-2'
+							/>
+							<span className='label-text-alt shrink-0'>
+								{characterCount}/{titleMaxChar}
+							</span>
+						</label>
+					)}
 				</div>
-			</div>
-			<hr />
+			) : (
+				<div className='flex justify-between pt-2'>
+					<label className='page-sheet-title font-bold pl-4'>{page.title}</label>
+					<div className='page-sheet-actions flex justify-end gap-2'>
+						{!isFocusMode ? (
+							<>
+								<button
+									type='button'
+									className='btn btn-xs btn-ghost'
+									onClick={handleFocusClick}
+									aria-label='Enter focus mode'>
+									<EnterFullScreenIcon />
+								</button>
+								<button
+									type='button'
+									className='btn btn-xs btn-ghost'
+									onClick={handleEditClick}
+									aria-label='Edit page'>
+									<Pencil1Icon />
+								</button>
+							</>
+						) : null}
+						{!page.locked && !isFocusMode ? (
+							<div className='dropdown dropdown-end'>
+								<div tabIndex={0} role='button' className='btn btn-xs btn-ghost'>
+									<DotsVerticalIcon />
+								</div>
+								<ul
+									tabIndex={0}
+									className='dropdown-content menu bg-base-200 rounded-box z-[1] w-52 p-2 shadow'>
+									<li>
+										<DeletePageBtn page={page} />
+									</li>
+								</ul>
+							</div>
+						) : null}
+					</div>
+				</div>
+			)}
+			<div className='border-t border-base-content/10' aria-hidden='true' />
 
-			<div className={`flex flex-col ${editing ? 'justify-between h-full min-h-0' : 'h-full min-h-0'}`}>
+			<div
+				className={`flex flex-col ${editing ? 'justify-between h-full min-h-0' : 'h-full min-h-0'}`}>
 				<div
 					className={`page-scroll page-sheet ${editing ? 'page-sheet-editing' : ''} ${
 						editTransition === 'enter' ? 'page-sheet-enter' : ''
@@ -332,7 +381,10 @@ const SinglePage = (page) => {
 	if (isFocusMode) {
 		return (
 			<>
-				<div ref={sheetRef} className='h-full invisible pointer-events-none' aria-hidden='true'>
+				<div
+					ref={sheetRef}
+					className='h-full invisible pointer-events-none'
+					aria-hidden='true'>
 					<Resizable
 						enable={false}
 						minWidth='300px'
@@ -346,8 +398,10 @@ const SinglePage = (page) => {
 				</div>
 				{isMounted
 					? createPortal(
-							<FocusModeOverlay origin={focusOrigin}>{sheetArticle}</FocusModeOverlay>,
-							document.body
+							<FocusModeOverlay origin={focusOrigin}>
+								{sheetArticle}
+							</FocusModeOverlay>,
+							document.body,
 						)
 					: null}
 			</>

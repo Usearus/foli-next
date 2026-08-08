@@ -9,6 +9,7 @@ import {
 	ArrowUpIcon,
 	ArrowDownIcon,
 } from '@radix-ui/react-icons';
+import EditJobBtn from './EditJobBtn';
 
 const JobsTableRow = (job) => {
 	const { fetchCurrentJob, fetchCurrentPages, userProfile } =
@@ -175,8 +176,8 @@ const JobsTableRow = (job) => {
 					<ul
 						tabIndex={0}
 						className='dropdown-content menu bg-base-200 rounded-box z-[1] w-52 p-2 shadow'>
-						<li>
-							<a>Edit</a>
+						<li onClick={(event) => event.stopPropagation()}>
+							<EditJobBtn job={job} label='Edit' />
 						</li>
 						<li>
 							<a>Delete</a>

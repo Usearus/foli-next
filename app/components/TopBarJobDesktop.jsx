@@ -3,6 +3,7 @@ import { useContext } from 'react';
 import { DatabaseContext } from '../context/DatabaseContext';
 import { ChevronDownIcon, DotsVerticalIcon } from '@radix-ui/react-icons';
 import AddPageDropdown from './AddPageDropdown';
+import EditJobBtn from './EditJobBtn';
 
 const TopBarJobDesktop = () => {
 	const { currentJob } = useContext(DatabaseContext);
@@ -74,7 +75,7 @@ const TopBarJobDesktop = () => {
 						tabIndex={0}
 						className='dropdown-content menu bg-base-100 rounded-box z-10 w-52 p-2 shadow'>
 						<li>
-							<a>Edit job</a>
+							<EditJobBtn job={currentJob} />
 						</li>
 						<li>
 							<a>Delete job</a>

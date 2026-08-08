@@ -1,4 +1,6 @@
 /** @type {import('tailwindcss').Config} */
+const { light, dark } = require('daisyui/src/theming/themes');
+
 module.exports = {
 	content: [
 		'./pages/**/*.{js,ts,jsx,tsx,mdx}',
@@ -31,7 +33,22 @@ module.exports = {
 	plugins: [require('daisyui')],
 
 	daisyui: {
-		themes: ['light', 'dark'], // false: only light + dark | true: all themes | array: specific themes like this ["light", "dark", "cupcake"]
+		themes: [
+			{
+				light: {
+					...light,
+					'base-100': '#f5f5f5',
+					'base-200': '#b8b8b8',
+					'base-300': '#8f8f8f',
+				},
+				dark: {
+					...dark,
+					'base-100': '#262d38',
+					'base-200': '#12161c',
+					'base-300': '#080a0e',
+				},
+			},
+		],
 		darkTheme: 'dark', // name of one of the included themes for dark mode
 		base: true, // applies background color and foreground color for root element by default
 		styled: true, // include daisyUI colors and design decisions for all components

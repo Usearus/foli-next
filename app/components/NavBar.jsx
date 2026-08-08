@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useContext } from 'react';
+import { usePathname } from 'next/navigation';
 import { DatabaseContext } from '../context/DatabaseContext';
 import { useFocusMode } from '../context/FocusModeContext';
 import { DEFAULT_USER } from '../config/user';
@@ -9,6 +10,9 @@ import { DEFAULT_USER } from '../config/user';
 const NavBar = () => {
 	const { adminProfile } = useContext(DatabaseContext);
 	const { focusPageId } = useFocusMode();
+	const pathname = usePathname();
+
+	const isActive = (href) => (pathname === href ? 'btn-active' : '');
 
 	if (focusPageId) {
 		return null;
@@ -21,11 +25,30 @@ const NavBar = () => {
 			border-b-2 border-base-100 
 			'>
 				{/* Left content */}
-				<div>
-					{/* Logo */}
+				<div className='flex gap-2 items-center'>
 					<Link href='/' id='content' className='btn btn-ghost text-lg'>
 						foli
 					</Link>
+					<div className='hidden md:flex'>
+						<Link
+							href='/'
+							className={`btn btn-ghost btn-sm ${isActive('/')}`}
+							id='jobs'>
+							Jobs
+						</Link>
+						<Link
+							href='/practice'
+							className={`btn btn-ghost btn-sm ${isActive('/practice')}`}
+							id='practice'>
+							Practice
+						</Link>
+						<Link
+							href='/my-questions'
+							className={`btn btn-ghost btn-sm ${isActive('/my-questions')}`}
+							id='my-questions'>
+							My questions
+						</Link>
+					</div>
 					{/* Test page */}
 					{adminProfile ? (
 						<div className='navbar-center hidden lg:flex'>

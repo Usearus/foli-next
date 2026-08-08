@@ -117,6 +117,59 @@ body {
   overflow-y: auto;
 }
 
+.page-sheet-container .page-scroll,
+.page-sheet-container .ql-container.ql-snow {
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+
+.page-sheet-container .page-scroll::-webkit-scrollbar,
+.page-sheet-container .ql-container.ql-snow::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.page-sheet-container .page-scroll::-webkit-scrollbar-thumb,
+.page-sheet-container .ql-container.ql-snow::-webkit-scrollbar-thumb {
+  background-color: transparent;
+  border-radius: 9999px;
+  transition: background-color 150ms ease;
+}
+
+@media (hover: hover) {
+  .page-sheet-container .page-sheet-actions {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 150ms ease;
+  }
+
+  .page-sheet-container:hover .page-sheet-actions,
+  .page-sheet-container:focus-within .page-sheet-actions {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .page-sheet-container:hover .page-scroll,
+  .page-sheet-container:focus-within .page-scroll,
+  .page-sheet-container:hover .ql-container.ql-snow,
+  .page-sheet-container:focus-within .ql-container.ql-snow {
+    scrollbar-color: rgba(127, 127, 127, 0.45) transparent;
+  }
+
+  .page-sheet-container:hover .page-scroll::-webkit-scrollbar-thumb,
+  .page-sheet-container:focus-within .page-scroll::-webkit-scrollbar-thumb,
+  .page-sheet-container:hover .ql-container.ql-snow::-webkit-scrollbar-thumb,
+  .page-sheet-container:focus-within .ql-container.ql-snow::-webkit-scrollbar-thumb {
+    background-color: rgba(127, 127, 127, 0.45);
+  }
+}
+
+.page-sheet-title {
+  font-size: 1.25rem;
+  line-height: 1.75rem;
+}
+
 [data-theme='dark'] .page-sheet-title {
   color: #ffffff;
 }

@@ -15,7 +15,7 @@ const PageList = () => {
 
 	useEffect(() => {
 		const pageToScrollTo = pageRef.current.find(
-			(page) => page.id === selectedPageID
+			(page) => page.id === selectedPageID,
 		);
 		// Scroll to the Page that is selected in Sidebar
 		if (pageToScrollTo && pageToScrollTo.ref.current) {

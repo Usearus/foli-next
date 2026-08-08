@@ -6,11 +6,11 @@ import {
 	ArrowUpIcon,
 	ArrowDownIcon,
 } from '@radix-ui/react-icons';
-import { DatabaseContext } from '../context/DatabaseContext';
-import { DEFAULT_USER } from '../config/user';
-import ThemeToggle from '../components/ThemeToggle';
-import ContentLoader from '../components/ContentLoader';
-import EditPreferencesBtn from '../components/EditPreferencesBtn';
+import { DatabaseContext } from '../../context/DatabaseContext';
+import { DEFAULT_USER } from '../../config/user';
+import ThemeToggle from '../../components/ThemeToggle';
+import ContentLoader from '../../components/ContentLoader';
+import EditPreferencesBtn from '../../components/EditPreferencesBtn';
 
 const Settings = () => {
 	const { userProfile, isProfileLoading } = useContext(DatabaseContext);

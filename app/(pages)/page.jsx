@@ -1,9 +1,9 @@
 'use client';
 
 import { useContext } from 'react';
-import { DatabaseContext } from './context/DatabaseContext';
-import JobsTable from './components/JobsTable';
-import AddJobBtn from './components/AddJobBtn';
+import { DatabaseContext } from '../context/DatabaseContext';
+import JobsTable from '../components/JobsTable';
+import AddJobBtn from '../components/AddJobBtn';
 
 const Page = () => {
 	const { userJobs, userJobsClosed } = useContext(DatabaseContext);

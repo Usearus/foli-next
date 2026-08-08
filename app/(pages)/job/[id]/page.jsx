@@ -1,21 +1,18 @@
 'use client';
 import { useContext, useState, useEffect } from 'react';
-import { DatabaseContext } from '../../context/DatabaseContext';
-import { useFocusMode } from '../../context/FocusModeContext';
-import SideBar from '../../components/SideBar';
-import TopBarJobDesktop from '../../components/TopBarJobDesktop';
-import PageList from '../../components/PageList';
-import Loader from '../../components/Loader';
+import { DatabaseContext } from '../../../context/DatabaseContext';
+import { useFocusMode } from '../../../context/FocusModeContext';
+import SideBar from '../../../components/SideBar';
+import TopBarJobDesktop from '../../../components/TopBarJobDesktop';
+import PageList from '../../../components/PageList';
+import Loader from '../../../components/Loader';
 
 const JobPage = () => {
 	const { currentPages } = useContext(DatabaseContext);
 	const { focusPageId } = useFocusMode();
 	const [isLoading, setIsLoading] = useState(true);
 
-	// Simulate loading
 	useEffect(() => {
-		// Assuming you have data loading or API calls here
-		// Set the loading state to false once everything is loaded
 		if (currentPages) {
 			setIsLoading(false);
 		}
@@ -40,17 +37,13 @@ const JobPage = () => {
 					focusedPage ? 'invisible h-0 overflow-hidden pointer-events-none' : ''
 				}`}
 				aria-hidden={focusedPage ? true : undefined}>
-				{/* Grid container with responsive adjustments */}
 				<div className='flex-grow grid grid-rows-[70px_auto] grid-cols-1 lg:grid-cols-[250px_auto]'>
-					{/* Top area */}
 					<TopBarJobDesktop />
 
-					{/* Bottom left area */}
 					<div className='hidden lg:flex flex-col row-span-1 bg-base-200 pt-4'>
 						<SideBar />
 					</div>
 
-					{/* Bottom right area */}
 					<div className='row-span-1 col-span-1 bg-base-200 p-4 overflow-hidden'>
 						<PageList />
 					</div>
