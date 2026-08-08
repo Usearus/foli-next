@@ -1,7 +1,9 @@
+'use client';
+
 import { useRef } from 'react';
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
-import { Quill } from 'react-quill';
+import ReactQuill, { Quill } from 'react-quill-new';
+const Size = Quill.import('attributors/style/size');
+Quill.register(Size, true);
 
 const ReactQuillEditor = ({ value, onChange }) => {
 	const editor = useRef(null);
@@ -12,9 +14,6 @@ const ReactQuillEditor = ({ value, onChange }) => {
 			quill.format('size', '16px'); // set default font size
 		}
 	};
-
-	var Size = Quill.import('attributors/style/size');
-	Quill.register(Size, true);
 
 	const modules = {
 		toolbar: [
@@ -28,7 +27,7 @@ const ReactQuillEditor = ({ value, onChange }) => {
 	};
 
 	return (
-		<>
+		<div className='quill-editor-enter'>
 			<ReactQuill
 				modules={modules}
 				theme='snow'
@@ -38,7 +37,7 @@ const ReactQuillEditor = ({ value, onChange }) => {
 				onFocus={handleOnFocus}
 				placeholder='Start typing content...'
 			/>
-		</>
+		</div>
 	);
 };
 

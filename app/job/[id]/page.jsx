@@ -1,6 +1,7 @@
 'use client';
 import { useContext, useState, useEffect } from 'react';
 import { DatabaseContext } from '../../context/DatabaseContext';
+import { useFocusMode } from '../../context/FocusModeContext';
 import SideBar from '../../components/SideBar';
 import TopBarJobDesktop from '../../components/TopBarJobDesktop';
 import PageList from '../../components/PageList';
@@ -8,6 +9,7 @@ import Loader from '../../components/Loader';
 
 const JobPage = () => {
 	const { currentPages } = useContext(DatabaseContext);
+	const { focusPageId } = useFocusMode();
 	const [isLoading, setIsLoading] = useState(true);
 
 	// Simulate loading
@@ -27,9 +29,17 @@ const JobPage = () => {
 		);
 	}
 
+	const focusedPage = focusPageId
+		? currentPages.find((page) => page.id === focusPageId)
+		: null;
+
 	if (currentPages.length > 0) {
 		return (
-			<div className='flex flex-col h-full text-base-content'>
+			<div
+				className={`flex flex-col h-full text-base-content ${
+					focusedPage ? 'invisible h-0 overflow-hidden pointer-events-none' : ''
+				}`}
+				aria-hidden={focusedPage ? true : undefined}>
 				{/* Grid container with responsive adjustments */}
 				<div className='flex-grow grid grid-rows-[70px_auto] grid-cols-1 lg:grid-cols-[250px_auto]'>
 					{/* Top area */}

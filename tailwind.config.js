@@ -6,7 +6,27 @@ module.exports = {
 		'./app/**/*.{js,ts,jsx,tsx,mdx}',
 	],
 	theme: {
-		extend: {},
+		extend: {
+			animation: {
+				'fade-in': 'fadeIn 300ms ease-out forwards',
+				'slide-in-right': 'slideInRight 500ms ease-out forwards',
+				'slide-out-right': 'slideOutRight 500ms ease-out forwards',
+			},
+			keyframes: {
+				fadeIn: {
+					'0%': { opacity: '0' },
+					'100%': { opacity: '1' },
+				},
+				slideInRight: {
+					'0%': { transform: 'translateX(100%)' },
+					'100%': { transform: 'translateX(0)' },
+				},
+				slideOutRight: {
+					'0%': { transform: 'translateX(0)' },
+					'100%': { transform: 'translateX(100%)' },
+				},
+			},
+		},
 	},
 	plugins: [require('daisyui')],
 

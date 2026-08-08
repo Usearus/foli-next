@@ -32,48 +32,101 @@ body {
   }
 }
 
-.markdown-content {
-   /* * {
-    color: var(--secondaryTextColor);
-  }  */
-/* 
-  a {
-    color: var(--primary-400);
-  } */
+.markdown-content,
+.ql-editor {
+  padding: 1rem;
+  font-size: 16px;
+  line-height: 1.5;
+  font-family: inherit;
+}
 
-  padding: 1rem 1rem;
+.markdown-content p,
+.ql-editor p,
+.markdown-content h1,
+.markdown-content h2,
+.markdown-content h3,
+.markdown-content h4,
+.markdown-content h5,
+.markdown-content h6,
+.ql-editor h1,
+.ql-editor h2,
+.ql-editor h3,
+.ql-editor h4,
+.ql-editor h5,
+.ql-editor h6,
+.markdown-content ol,
+.markdown-content ul,
+.ql-editor ol,
+.ql-editor ul {
+  margin: 0;
+  padding: 0;
+}
 
-  h1 {
-    font-size: 1.8rem;
-  }
+.markdown-content h1,
+.ql-snow .ql-editor h1 {
+  font-size: 2em !important;
+}
 
-  h2 {
-    font-size: 1.25rem;
-  }
+.markdown-content h2,
+.ql-snow .ql-editor h2 {
+  font-size: 1.5em !important;
+}
 
-  h3 {
-    font-size: 1rem;
-  }
+.markdown-content h3,
+.ql-snow .ql-editor h3 {
+  font-size: 1.17em !important;
+}
 
-  h4 {
-    font-size: 1rem;
-  }
+.markdown-content h4,
+.ql-snow .ql-editor h4 {
+  font-size: 1em !important;
+}
 
-  h5 {
-    font-size: 1rem;
-  }
-  p {
-    margin-bottom: 0;
-  }
+.markdown-content h5,
+.ql-snow .ql-editor h5 {
+  font-size: 0.83em !important;
+}
 
-  ul li {
-    padding-bottom: .5rem !important;
-    margin-left: 1.5rem;
-    list-style-type: circle !important;
-  }
+.markdown-content h6,
+.ql-snow .ql-editor h6 {
+  font-size: 0.67em !important;
+}
+
+.markdown-content ol,
+.markdown-content ul,
+.ql-editor ol,
+.ql-editor ul {
+  padding-left: 1.5rem;
+}
+
+.markdown-content ul li,
+.ql-editor ul li {
+  padding-bottom: 0.5rem;
+  list-style-type: circle;
+  list-style-position: outside;
+}
+
+.markdown-content ol li {
+  padding-bottom: 0.5rem;
+  list-style-type: decimal;
+  list-style-position: outside;
 }
 
 .page-scroll {
   height: calc(100vh - 320px); /* 100vh minus the height of the navbar */
   overflow-y: auto;
+}
+
+[data-theme='dark'] .page-sheet-title {
+  color: #ffffff;
+}
+
+.focus-mode-panel .focus-mode-page-scroll {
+  height: auto;
+  flex: 1;
+  min-height: 0;
+}
+
+.focus-mode-panel .page-scroll {
+  height: auto;
 }

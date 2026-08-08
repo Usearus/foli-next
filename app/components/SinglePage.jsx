@@ -1,34 +1,36 @@
 'use client';
 
 import { useState, useContext, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { DatabaseContext } from '../context/DatabaseContext';
-import ReactQuillEditor from './ReactQuillEditor';
+import { useFocusMode } from '../context/FocusModeContext';
+import dynamic from 'next/dynamic';
+
+const ReactQuillEditor = dynamic(() => import('./ReactQuillEditor'), { ssr: false });
 import MarkdownView from 'react-showdown';
 import useAlert from '../alerts/useAlert';
-import ModalDeleteConfirmation from '../components/ModalDeleteConfirmation';
-import { DotsVerticalIcon, GearIcon, ExitIcon } from '@radix-ui/react-icons';
-// import ModalEditPage
+import DeletePageBtn from './DeletePageBtn';
+import FocusModeOverlay from './FocusModeOverlay';
+import { DotsVerticalIcon, EnterFullScreenIcon, Pencil1Icon } from '@radix-ui/react-icons';
 import { supabase } from '../api/supabase';
 import { Resizable } from 're-resizable';
+
+const EDIT_TRANSITION_MS = 400;
+const FOCUS_MODE_MAX_WIDTH = 700;
 
 const SinglePage = (page) => {
 	// Context Variables
 	const { fetchCurrentPages, currentJob } = useContext(DatabaseContext);
+	const { focusPageId, focusOrigin, enterFocusMode, exitFocusMode } = useFocusMode();
 	const { setAlert } = useAlert();
+	const isFocusMode = focusPageId === page.id;
+	const sheetRef = useRef(null);
 
 	// Modals
-	const [selectedEventKey, setSelectedEventKey] = useState(null);
-	const [showDeleteModal, setShowDeleteModal] = useState(false);
 	const [showEditPageModal, setShowEditPageModal] = useState(false);
 
 	const handleOpenPageModalClick = () => {
 		setShowEditPageModal(true);
-	};
-
-	const handleCloseReset = () => {
-		// Will close any modal opened by the dropdown
-		console.log('handleCloseReset called');
-		setShowDeleteModal(false);
 	};
 
 	// PAGE FUNCTIONS
@@ -37,8 +39,7 @@ const SinglePage = (page) => {
 	const isMobile = window.matchMedia('(max-width: 768px)').matches;
 
 	// Resizing
-	const [pageWidth, setPageWidth] = useState(page.width);
-	console.log(pageWidth);
+	const [pageWidth, setPageWidth] = useState(page.width || 400);
 
 	useEffect(() => {
 		// Function to fetch and set the page width from the database
@@ -61,7 +62,6 @@ const SinglePage = (page) => {
 	}, [page.id]);
 
 	const handleUpdateWidthClick = async (newPageWidth) => {
-		console.log('Updating width to:', newPageWidth);
 		setPageWidth(newPageWidth);
 		const { error } = await supabase
 			.from('pages')
@@ -69,26 +69,78 @@ const SinglePage = (page) => {
 				width: newPageWidth,
 			})
 			.eq('id', page.id);
-		// setAlert('Page width updated', 'success');
 
 		if (error) {
 			setAlert('Unable to update page width.', 'danger');
 			console.log('error is', error);
-			return;
 		}
 	};
 
 	// EDITING PAGE FUNCTIONS
 	const [editing, setEditing] = useState(false);
+	const [editTransition, setEditTransition] = useState(null);
+	const [showViewLayer, setShowViewLayer] = useState(true);
+	const [showEditorLayer, setShowEditorLayer] = useState(false);
+	const [isMounted, setIsMounted] = useState(false);
+
+	useEffect(() => {
+		setIsMounted(true);
+	}, []);
+
 	const handleEditClick = () => {
 		setEditing(true);
-		// console.log('editing is now', editing);
+		setEditTransition('enter');
+		setShowViewLayer(true);
+		setShowEditorLayer(true);
 	};
+
+	const handleFocusClick = () => {
+		const rect = sheetRef.current?.getBoundingClientRect?.();
+		if (rect) {
+			enterFocusMode(page.id, {
+				top: rect.top,
+				left: rect.left,
+				width: rect.width,
+				height: rect.height,
+			});
+		} else {
+			enterFocusMode(page.id, null);
+		}
+		handleEditClick();
+	};
+
+	const startExitEdit = () => {
+		setShowViewLayer(true);
+		setEditTransition('exit');
+	};
+
+	useEffect(() => {
+		if (editTransition === 'enter') {
+			const timer = setTimeout(() => {
+				setEditTransition(null);
+				setShowViewLayer(false);
+			}, EDIT_TRANSITION_MS);
+			return () => clearTimeout(timer);
+		}
+
+		if (editTransition === 'exit') {
+			const timer = setTimeout(() => {
+				setEditing(false);
+				setEditTransition(null);
+				setShowEditorLayer(false);
+				setShowViewLayer(true);
+				if (focusPageId === page.id) {
+					exitFocusMode();
+				}
+			}, EDIT_TRANSITION_MS);
+			return () => clearTimeout(timer);
+		}
+	}, [editTransition, exitFocusMode, focusPageId, page.id]);
 
 	const handleCancelClick = () => {
 		setContent(page.content);
-		setEditing(false);
 		setShowEditPageModal(false);
+		startExitEdit();
 	};
 
 	const closeEditorWarning = (event) => {
@@ -117,8 +169,27 @@ const SinglePage = (page) => {
 		};
 	}, [editing]);
 
+	useEffect(() => {
+		if (!isFocusMode) {
+			return;
+		}
+
+		const handleEscape = (event) => {
+			if (event.key === 'Escape') {
+				setContent(page.content);
+				setShowEditPageModal(false);
+				startExitEdit();
+			}
+		};
+
+		window.addEventListener('keydown', handleEscape);
+
+		return () => window.removeEventListener('keydown', handleEscape);
+	}, [isFocusMode, page.content]);
+
 	// React Quill Editor Variables & Functions
 	const [content, setContent] = useState(page.content);
+	const [title] = useState(page.title);
 
 	const handleEditorChange = (value) => {
 		setContent(value);
@@ -132,166 +203,186 @@ const SinglePage = (page) => {
 					content: content,
 				})
 				.eq('id', page.id);
-			setAlert('Page updated', 'success');
-			fetchCurrentPages(currentJob);
-			setEditing(false);
-			setShowEditPageModal(false);
+
 			if (error) {
 				setAlert('Unable to update page', 'danger');
 				console.log('error is', error);
 				return;
 			}
-		}
-		if (!page.locked) {
-			const { error } = await supabase
-				.from('pages')
-				.update({
-					content: content,
-					title: titleRef.current.value,
-				})
-				.eq('id', page.id);
+
 			setAlert('Page updated', 'success');
 			fetchCurrentPages(currentJob);
-			setEditing(false);
 			setShowEditPageModal(false);
-			if (error) {
-				setAlert('Unable to update page', 'danger');
-				console.log('error is', error);
-				return;
-			}
+			startExitEdit();
+			return;
 		}
-	};
 
-	// Editing Title
-	const initialTitleValue = page.title ?? '';
-	const [title, setTitle] = useState(page.title);
-	const titleRef = useRef();
-	const [characterCount, setCharacterCount] = useState(title.length);
-	const titleMaxChar = 32;
+		const { error } = await supabase
+			.from('pages')
+			.update({
+				content: content,
+				title: title,
+			})
+			.eq('id', page.id);
 
-	const handleTitleChange = (event) => {
-		const newValue = event.target.value;
-		setCharacterCount(newValue.length);
+		if (error) {
+			setAlert('Unable to update page', 'danger');
+			console.log('error is', error);
+			return;
+		}
+
+		setAlert('Page updated', 'success');
+		fetchCurrentPages(currentJob);
+		setShowEditPageModal(false);
+		startExitEdit();
 	};
 
 	if (initialVisibleValue === false) {
 		return <></>;
 	}
 
-	// DESKTOP PAGE
-	// if (isMobile === false) {
-	return (
-		<Resizable
-			// className={`${editing ? 'editing-content' : 'page-content'} shadow-on`}
-			enable={{
-				top: false,
-				right: true,
-				bottom: false,
-				left: false,
-				topRight: false,
-				bottomRight: false,
-				bottomLeft: false,
-				topLeft: false,
-			}}
-			onResizeStop={(e, direction, ref, d) => {
-				const newPageWidth = pageWidth + d.width;
-				handleUpdateWidthClick(newPageWidth);
-			}}
-			minWidth='300px'
-			maxWidth='700px'
-			size={{
-				height: '100%',
-				width: pageWidth,
-			}}>
-			<article
-				className='bg-base-100 h-full p-4 flex flex-col gap-2'
-				style={{ width: pageWidth }}>
-				<div className='flex justify-between'>
-					<label className='font-bold'>{page.title}</label>
-					<div className='dropdown dropdown-end'>
-						<div tabIndex={0} role='button' className='btn btn-xs btn-ghost '>
-							<DotsVerticalIcon />
+	const sheetArticle = (
+		<article className='bg-base-100 h-full w-full p-4 flex flex-col gap-2 shadow-sm rounded-lg'>
+			<div className='flex justify-between'>
+				<label className='page-sheet-title font-bold pl-2'>{page.title}</label>
+				<div className='flex justify-end gap-2'>
+					{!editing && !isFocusMode ? (
+						<>
+							<button
+								type='button'
+								className='btn btn-xs btn-ghost'
+								onClick={handleFocusClick}
+								aria-label='Enter focus mode'>
+								<EnterFullScreenIcon />
+							</button>
+							<button
+								type='button'
+								className='btn btn-xs btn-ghost'
+								onClick={handleEditClick}
+								aria-label='Edit page'>
+								<Pencil1Icon />
+							</button>
+						</>
+					) : null}
+					{!page.locked && !isFocusMode ? (
+						<div className='dropdown dropdown-end'>
+							<div tabIndex={0} role='button' className='btn btn-xs btn-ghost'>
+								<DotsVerticalIcon />
+							</div>
+							<ul
+								tabIndex={0}
+								className='dropdown-content menu bg-base-200 rounded-box z-[1] w-52 p-2 shadow'>
+								<li>
+									<DeletePageBtn page={page} />
+								</li>
+							</ul>
 						</div>
-						<ul
-							tabIndex={0}
-							className='dropdown-content menu bg-base-200 rounded-box z-[1] w-52 p-2 shadow'>
-							<li>
-								<a>Edit</a>
-							</li>
-							<li>
-								<a
-									onClick={() =>
-										document.getElementById('my_modal_3').showModal()
-									}>
-									Delete
-								</a>
-								<dialog
-									id='my_modal_3'
-									className='modal flex justify-center items-center'>
-									<div className='modal-box bg-base-200'>
-										<form method='dialog'>
-											<button className='btn btn-sm btn-circle btn-ghost absolute right-2 top-2'>
-												✕
-											</button>
-										</form>
-										<h3 className='font-bold text-lg'>Delete page</h3>
-										<p className='py-4'>
-											Are you sure you want to delete this page?
-										</p>
-										<div className='modal-action'>
-											<button className='btn btn-outline btn-error'>
-												Confirm delete
-											</button>
-										</div>
-									</div>
-								</dialog>
-							</li>
-						</ul>
-					</div>
+					) : null}
 				</div>
-				<hr />
+			</div>
+			<hr />
 
-				{editing ? (
-					// Quill version
-					<div className='flex flex-col justify-between h-full'>
-						<div className='page-scroll'>
+			<div className={`flex flex-col ${editing ? 'justify-between h-full min-h-0' : 'h-full min-h-0'}`}>
+				<div
+					className={`page-scroll page-sheet ${editing ? 'page-sheet-editing' : ''} ${
+						editTransition === 'enter' ? 'page-sheet-enter' : ''
+					} ${editTransition === 'exit' ? 'page-sheet-exit' : ''} ${
+						isFocusMode ? 'focus-mode-page-scroll' : ''
+					}`}>
+					{(showViewLayer || !editing) && (
+						<div
+							className={`page-sheet-view ${
+								editTransition === 'enter' ? 'page-sheet-view-exiting' : ''
+							} ${editTransition === 'exit' ? 'page-sheet-view-entering' : ''}`}>
+							<MarkdownView
+								className='markdown-content'
+								markdown={
+									editTransition === 'exit' || editing ? content : page.content
+								}
+							/>
+						</div>
+					)}
+					{showEditorLayer ? (
+						<div className='page-sheet-editor'>
 							<ReactQuillEditor value={content} onChange={handleEditorChange} />
 						</div>
-						<div className='flex justify-end gap-2'>
-							<button
-								type='button'
-								className='btn btn-sm btn-ghost btn-primary w-fit'
-								onClick={handleCancelClick}>
-								Cancel
-							</button>
-							<button
-								type='button'
-								className='btn btn-sm btn-primary w-fit'
-								onClick={handleUpdateContentClick}>
-								Save page
-							</button>
-						</div>
+					) : null}
+				</div>
+
+				{editing && editTransition !== 'exit' ? (
+					<div className='flex justify-end gap-2 pt-2'>
+						<button
+							type='button'
+							className='btn btn-sm btn-ghost btn-primary w-fit'
+							onClick={handleCancelClick}>
+							Cancel
+						</button>
+						<button
+							type='button'
+							className='btn btn-sm btn-primary w-fit'
+							onClick={handleUpdateContentClick}>
+							Save page
+						</button>
 					</div>
-				) : (
-					// Markdown version
-					<div className='flex flex-col justify-between h-full'>
-						<MarkdownView
-							className='page-scroll markdown-content'
-							markdown={page.content}
-						/>
-						<div className='flex justify-end'>
-							<button
-								type='button'
-								className='btn btn-sm btn-outline btn-primary w-fit'
-								onClick={handleEditClick}>
-								Edit page
-							</button>
-						</div>
-					</div>
-				)}
-			</article>
-		</Resizable>
+				) : null}
+			</div>
+		</article>
+	);
+
+	if (isFocusMode) {
+		return (
+			<>
+				<div ref={sheetRef} className='h-full invisible pointer-events-none' aria-hidden='true'>
+					<Resizable
+						enable={false}
+						minWidth='300px'
+						maxWidth={`${FOCUS_MODE_MAX_WIDTH}px`}
+						size={{
+							height: '100%',
+							width: pageWidth,
+						}}>
+						<div className='h-full' />
+					</Resizable>
+				</div>
+				{isMounted
+					? createPortal(
+							<FocusModeOverlay origin={focusOrigin}>{sheetArticle}</FocusModeOverlay>,
+							document.body
+						)
+					: null}
+			</>
+		);
+	}
+
+	return (
+		<div ref={sheetRef} className='h-full'>
+			<Resizable
+				enable={{
+					top: false,
+					right: true,
+					bottom: false,
+					left: false,
+					topRight: false,
+					bottomRight: false,
+					bottomLeft: false,
+					topLeft: false,
+				}}
+				onResize={(e, direction, ref) => {
+					setPageWidth(ref.offsetWidth);
+				}}
+				onResizeStop={(e, direction, ref) => {
+					handleUpdateWidthClick(ref.offsetWidth);
+				}}
+				minWidth='300px'
+				maxWidth={`${FOCUS_MODE_MAX_WIDTH}px`}
+				size={{
+					height: '100%',
+					width: pageWidth,
+				}}>
+				{sheetArticle}
+			</Resizable>
+		</div>
 	);
 };
-// };
+
 export default SinglePage;

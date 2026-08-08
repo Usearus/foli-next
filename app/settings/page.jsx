@@ -1,134 +1,204 @@
 'use client';
 
-import { useState, useEffect, useRef, useContext } from 'react';
-import { LockClosedIcon } from '@radix-ui/react-icons';
-import { useUser } from '@auth0/nextjs-auth0/client';
+import { useRef, useContext } from 'react';
+import {
+	LockClosedIcon,
+	ArrowUpIcon,
+	ArrowDownIcon,
+} from '@radix-ui/react-icons';
 import { DatabaseContext } from '../context/DatabaseContext';
-import useAlert from '../alerts/useAlert';
+import { DEFAULT_USER } from '../config/user';
 import ThemeToggle from '../components/ThemeToggle';
-import Loader from '../components/Loader';
+import ContentLoader from '../components/ContentLoader';
+import EditPreferencesBtn from '../components/EditPreferencesBtn';
 
 const Settings = () => {
-	const { user } = useUser();
-	const { userProfile } = useContext(DatabaseContext);
-	const { setAlert } = useAlert();
-	const [isLoading, setIsLoading] = useState(true);
+	const { userProfile, isProfileLoading } = useContext(DatabaseContext);
 
-	// Refs for each section
-	const accountRef = useRef(null);
 	const profileRef = useRef(null);
-	const jobSearchRef = useRef(null);
+	const jobPreferencesRef = useRef(null);
+	const contentRef = useRef(null);
 
-	// Simulate loading
-	useEffect(() => {
-		// Assuming you have data loading or API calls here
-		// Set the loading state to false once everything is loaded
-		if (user && userProfile) {
-			setIsLoading(false);
-		}
-	}, [user, userProfile]);
-
-	// Function to scroll to a specific section
 	const scrollToSection = (ref) => {
-		if (ref && ref.current) {
-			ref.current.scrollIntoView({ behavior: 'smooth' });
-		}
+		if (!ref?.current || !contentRef?.current) return;
+
+		const container = contentRef.current;
+		const target = ref.current;
+		const scrollTop =
+			container.scrollTop +
+			target.getBoundingClientRect().top -
+			container.getBoundingClientRect().top;
+
+		container.scrollTo({ top: scrollTop, behavior: 'smooth' });
 	};
 
-	if (isLoading) {
+	if (isProfileLoading) {
 		return (
-			<div className='flex justify-center items-center h-full'>
-				<Loader />
+			<div className='h-full min-h-0 text-base-content px-0 py-4 flex'>
+				<div className='w-[350px] hidden lg:flex shrink-0' />
+				<div className='flex flex-1 min-h-0 justify-center w-full overflow-y-auto'>
+					<ContentLoader className='max-w-[700px]' />
+				</div>
 			</div>
 		);
 	}
 
+	const targetSalaryIncrease =
+		userProfile?.salary_target !== undefined &&
+		userProfile?.salary_current !== undefined
+			? Math.round(
+					((userProfile.salary_target - userProfile.salary_current) /
+						userProfile.salary_current) *
+						100
+			  )
+			: undefined;
+
+	const salaryIncreaseClassName =
+		targetSalaryIncrease > 0 ? 'text-success' : 'text-error';
+
+	const formattedSalaryIncrease =
+		targetSalaryIncrease !== undefined ? (
+			targetSalaryIncrease > 0 ? (
+				<div className='flex items-center'>
+					<ArrowUpIcon className='inline-block mr-1' />
+					{targetSalaryIncrease}%
+				</div>
+			) : (
+				<div className='flex items-center'>
+					<ArrowDownIcon className='inline-block mr-1' />
+					{Math.abs(targetSalaryIncrease)}%
+				</div>
+			)
+		) : (
+			''
+		);
+
+	const tooltipText =
+		targetSalaryIncrease !== undefined
+			? targetSalaryIncrease > 0
+				? `${targetSalaryIncrease}% higher than current salary`
+				: `${Math.abs(targetSalaryIncrease)}% lower than current salary`
+			: '';
+
+	const targetSalaryDisplay = (() => {
+		if (userProfile?.salary_target && userProfile?.salary_current) {
+			return (
+				<>
+					${userProfile.salary_target.toLocaleString()}{' '}
+					<div className='tooltip' data-tip={tooltipText}>
+						<span className={`badge badge-outline ${salaryIncreaseClassName}`}>
+							{formattedSalaryIncrease}
+						</span>
+					</div>
+				</>
+			);
+		}
+
+		if (userProfile?.salary_target && !userProfile?.salary_current) {
+			return `$${userProfile.salary_target.toLocaleString()}`;
+		}
+
+		return '-';
+	})();
+
+	const firstName = DEFAULT_USER.name.split(' ')[0];
+
 	return (
-		<div className='h-full text-base-content px-0 py-4 bg-base-200 flex'>
+		<div className='h-full min-h-0 text-base-content px-0 py-4 flex'>
 			{/* Sidebar */}
-			<div className='w-[250px] hidden md:block'>
+			<div className='w-[350px] hidden lg:flex shrink-0'>
 				<ul className='menu'>
 					<li>
 						<span className='font-bold'>General</span>
 						<ul>
 							<li>
-								<a onClick={() => scrollToSection(accountRef)}>Account</a>
+								<button type='button' onClick={() => scrollToSection(profileRef)}>
+									Profile
+								</button>
 							</li>
 							<li>
-								<a onClick={() => scrollToSection(profileRef)}>Profile</a>
-							</li>
-							<li>
-								<a onClick={() => scrollToSection(jobSearchRef)}>Job search</a>
+								<button
+									type='button'
+									onClick={() => scrollToSection(jobPreferencesRef)}>
+									Job preferences
+								</button>
 							</li>
 						</ul>
 					</li>
 					<li className='disabled'>
 						<span className='justify-between'>
-							<a>Resume</a> <LockClosedIcon />
+							<button type='button'>Resume</button> <LockClosedIcon />
 						</span>
 						<ul>
 							<li className='disabled'>
 								<span className='justify-between'>
-									<a>Contact</a> <LockClosedIcon />
+									<button type='button'>Contact</button> <LockClosedIcon />
 								</span>
 							</li>
 							<li className='disabled'>
 								<span className='justify-between'>
-									<a>Summary</a> <LockClosedIcon />
+									<button type='button'>Summary</button> <LockClosedIcon />
 								</span>
 							</li>
 							<li className='disabled'>
 								<span className='justify-between'>
-									<a>Work history</a> <LockClosedIcon />
+									<button type='button'>Work history</button> <LockClosedIcon />
 								</span>
 							</li>
 							<li className='disabled'>
 								<span className='justify-between'>
-									<a>Education</a> <LockClosedIcon />
+									<button type='button'>Education</button> <LockClosedIcon />
 								</span>
 							</li>
 							<li className='disabled'>
 								<span className='justify-between'>
-									<a>Skills</a> <LockClosedIcon />
+									<button type='button'>Skills</button> <LockClosedIcon />
 								</span>
 							</li>
 						</ul>
 					</li>
 				</ul>
 			</div>
-			{/* Content */}
-			<div className='flex justify-center w-full overflow-y-auto'>
-				<div className='max-w-[700px]  w-full p-4 flex flex-col gap-4 '>
-					{/* Account card */}
-					<div ref={accountRef} className='bg-base-100 p-8 flex flex-col gap-6'>
+
+			{/* Content cards */}
+			<div
+				ref={contentRef}
+				className='flex flex-1 min-h-0 justify-center w-full overflow-y-auto'>
+				<div className='max-w-[700px] w-full p-4 flex flex-col gap-4'>
+					<div ref={profileRef} className='bg-base-100 rounded-box p-8 flex flex-col gap-6'>
 						<div>
-							<h2 className='text-xl font-bold'>Account settings</h2>
+							<h2 className='text-xl font-bold'>Profile</h2>
 						</div>
-						{user ? (
+						{userProfile ? (
 							<div className='flex flex-col gap-4'>
-								<label className='form-control w-full max-w-xs'>
+								<label className='form-control w-full'>
 									<div className='label font-bold'>
-										<span className='label-text'>Name</span>
+										<span className='label-text'>Picture</span>
 									</div>
-									<div className='px-4 py-2'>{user.name}</div>
+									<div className='avatar placeholder'>
+										<div className='bg-neutral text-neutral-content w-16 rounded-full'>
+											<span className='text-xl'>
+												{userProfile.email?.[0]?.toUpperCase() ?? 'A'}
+											</span>
+										</div>
+									</div>
 								</label>
 								<div className='divider m-0'></div>
-								<label className='form-control w-full max-w-xs'>
-									<div className='label font-bold'>
-										<span className='label-text'>Email</span>
-									</div>
-									<div className='px-4 py-2'>{user.email}</div>
-								</label>
-							</div>
-						) : null}
-					</div>
-					{/* Profile card */}
-					<div ref={profileRef} className='bg-base-100 p-8 flex flex-col gap-6'>
-						<div>
-							<h2 className='text-xl font-bold'>Profile settings</h2>
-						</div>
-						{user ? (
-							<div className='flex flex-col gap-4'>
+								<div className='flex gap-4'>
+									<label className='form-control w-full'>
+										<div className='label font-bold'>
+											<span className='label-text'>Name</span>
+										</div>
+										<div className='px-1'>{firstName}</div>
+									</label>
+									<label className='form-control w-full'>
+										<div className='label font-bold'>
+											<span className='label-text'>Email</span>
+										</div>
+										<div className='px-1'>{userProfile.email}</div>
+									</label>
+								</div>
+								<div className='divider m-0'></div>
 								<label className='w-full flex justify-between'>
 									<div className='label font-bold'>
 										<span className='label-text'>Interface theme</span>
@@ -138,50 +208,68 @@ const Settings = () => {
 							</div>
 						) : null}
 					</div>
-					{/* Job search card */}
-					<div
-						ref={jobSearchRef}
-						className='bg-base-100 p-8 flex flex-col gap-6'>
-						<div>
-							<h2 className='text-xl font-bold'>Job search settings</h2>
-						</div>
-						{userProfile ? (
+
+					{userProfile ? (
+						<div
+							ref={jobPreferencesRef}
+							className='bg-base-100 rounded-box p-8 flex flex-col gap-6'>
+							<div className='flex justify-between items-center'>
+								<h2 className='text-xl font-bold'>Job preferences</h2>
+								<EditPreferencesBtn />
+							</div>
 							<div className='flex flex-col gap-4'>
-								<label className='form-control w-full max-w-xs'>
+								<label className='form-control w-full'>
 									<div className='label font-bold'>
 										<span className='label-text'>Target position</span>
 									</div>
-									<div className='px-4 py-2'>{userProfile.position}</div>
-								</label>
-								<div className='divider m-0'></div>
-								<label className='form-control w-full max-w-xs'>
-									<div className='label font-bold'>
-										<span className='label-text'>Current salary</span>
-									</div>
-									<div className='px-4 py-2'>N/A</div>
-								</label>
-								<div className='divider m-0'></div>
-								<label className='form-control w-full max-w-xs'>
-									<div className='label font-bold'>
-										<span className='label-text'>Target salary</span>
-									</div>
-									<div className='px-4 py-2'>
-										{userProfile.salary_min !== undefined &&
-										userProfile.salary_max !== undefined
-											? `$${userProfile.salary_min.toLocaleString()} - $${userProfile.salary_max.toLocaleString()}`
-											: 'Salary range not specified'}
+									<div className='px-1'>
+										{userProfile.position ? userProfile.position : '-'}
 									</div>
 								</label>
 								<div className='divider m-0'></div>
-								<label className='form-control w-full max-w-xs'>
+								<div className='flex gap-4'>
+									<label className='form-control w-full'>
+										<div className='label font-bold'>
+											<span className='label-text'>Current Salary</span>
+										</div>
+										<div className='px-1'>
+											{userProfile.salary_current !== undefined &&
+											userProfile.salary_current !== null
+												? `$${userProfile.salary_current.toLocaleString()}`
+												: '-'}
+										</div>
+									</label>
+									<label className='form-control w-full'>
+										<div className='label font-bold'>
+											<span className='label-text'>Target salary</span>
+										</div>
+										<div className='px-1'>{targetSalaryDisplay}</div>
+									</label>
+								</div>
+								<div className='divider m-0'></div>
+								<label className='form-control w-full'>
 									<div className='label font-bold'>
-										<span className='label-text'>Target salary increase</span>
+										<span className='label-text'>Locations</span>
 									</div>
-									<div className='px-4 py-2'>N/A</div>
+									<div className='flex gap-2 flex-wrap'>
+										{Array.isArray(userProfile.location_preference) &&
+											userProfile.location_preference.map((location) => (
+												<div
+													key={location}
+													className='badge badge-neutral mt-2'>
+													{location}
+												</div>
+											))}
+										{userProfile.location_remote ? (
+											<div className='badge badge-neutral mt-2'>
+												Remote / Hybrid
+											</div>
+										) : null}
+									</div>
 								</label>
 							</div>
-						) : null}
-					</div>
+						</div>
+					) : null}
 				</div>
 			</div>
 		</div>

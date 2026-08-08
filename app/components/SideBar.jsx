@@ -1,7 +1,7 @@
 'use client';
 import { useState, useContext, useEffect } from 'react';
 import { DatabaseContext } from '../context/DatabaseContext';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import { DragDropContext, Draggable } from 'react-beautiful-dnd';
 import SideBarItem from './SideBarItem';
 import { supabase } from '../api/supabase';
 import { StrictModeDroppable } from './StrictModeDroppable'; // Import the StrictModeDroppable
@@ -65,7 +65,10 @@ const SideBar = () => {
 								ref={provided.innerRef}
 								className={`draggable-area ${isDragging ? 'dragging' : ''}`}>
 								{currentPages.map((page, index) => (
-									<Draggable key={page.id} draggableId={page.id} index={index}>
+									<Draggable
+										key={page.id}
+										draggableId={String(page.id)}
+										index={index}>
 										{(provided) => (
 											<div
 												ref={provided.innerRef}

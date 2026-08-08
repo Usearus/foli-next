@@ -1,7 +1,15 @@
+'use client';
+
 import { useEffect, useState } from 'react';
 import { Droppable } from 'react-beautiful-dnd';
 
-export const StrictModeDroppable = ({ children = null, ...props }) => {
+export const StrictModeDroppable = ({
+	children,
+	isDropDisabled = false,
+	isCombineEnabled = false,
+	ignoreContainerClipping = false,
+	...props
+}) => {
 	const [enabled, setEnabled] = useState(false);
 
 	useEffect(() => {
@@ -16,5 +24,13 @@ export const StrictModeDroppable = ({ children = null, ...props }) => {
 		return null;
 	}
 
-	return <Droppable {...props}>{children}</Droppable>;
+	return (
+		<Droppable
+			{...props}
+			isDropDisabled={isDropDisabled}
+			isCombineEnabled={isCombineEnabled}
+			ignoreContainerClipping={ignoreContainerClipping}>
+			{children}
+		</Droppable>
+	);
 };

@@ -1,13 +1,13 @@
 'use client';
-import { useContext, useState } from 'react';
+import { useContext } from 'react';
 import { DatabaseContext } from '../context/DatabaseContext';
-import { EyeOpenIcon, EyeClosedIcon, TrashIcon } from '@radix-ui/react-icons';
+import { EyeOpenIcon, EyeClosedIcon } from '@radix-ui/react-icons';
 import { supabase } from '../api/supabase';
+import DeletePageIcon from './DeletePageIcon';
 
 const SideBarItem = ({ page, setShowOffcanvas, showOffcanvas }) => {
 	const { fetchCurrentPages, currentJob, setSelectedPageID } =
 		useContext(DatabaseContext);
-	const [showDeleteModal, setShowDeleteModal] = useState(false);
 
 	const handleVisibilityClick = async () => {
 		const visible = page.visible;
@@ -20,17 +20,6 @@ const SideBarItem = ({ page, setShowOffcanvas, showOffcanvas }) => {
 		fetchCurrentPages(currentJob);
 	};
 
-	// Will close any modal opened by the dropdown
-	// const handleCloseModal = () => {
-	// 	setShowDeleteModal(false);
-	// };
-
-	// Will handle any modal option selected
-	// const handleDeleteModal = () => {
-	// 	setShowDeleteModal(true);
-	// };
-
-	// Will scroll screen to that item
 	const handleSideBarItemClick = () => {
 		setSelectedPageID(page.id);
 		if (showOffcanvas === true) {
@@ -49,11 +38,7 @@ const SideBarItem = ({ page, setShowOffcanvas, showOffcanvas }) => {
 						{page.title}
 					</p>
 					<div className='flex gap-1'>
-						<div
-							role='button'
-							className='btn btn-xs hidden group-hover:flex transition-opacity duration-200'>
-							<TrashIcon />
-						</div>
+						{page.locked ? null : <DeletePageIcon page={page} />}
 						<div
 							role='button'
 							onClick={handleVisibilityClick}
