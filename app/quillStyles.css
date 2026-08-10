@@ -448,6 +448,26 @@
     right: 1.75rem !important;
 }
 
+.quill-selection-menu {
+    position: absolute;
+    z-index: 30;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 0.125rem;
+    padding: 0.25rem;
+    border-radius: var(--quill-toolbar-border-radius);
+    background: var(--quill-toolbar-background);
+    border: 1px solid var(--quill-toolbar-border-color);
+    box-shadow: var(--quill-box-shadow);
+    pointer-events: auto;
+}
+
+.quill-selection-menu .btn:hover {
+    background-color: var(--color-primary);
+    color: var(--color-primary-content);
+}
+
 /* Custom size picker labels */
 .ql-snow .ql-picker.ql-size .ql-picker-label::before,
 .ql-snow .ql-picker.ql-size .ql-picker-item::before {

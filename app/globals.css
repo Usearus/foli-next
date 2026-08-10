@@ -67,6 +67,16 @@ body {
   @apply bg-base-200 text-base-content min-h-screen;
 }
 
+::selection {
+  background-color: var(--color-secondary);
+  color: var(--color-secondary-content);
+}
+
+::-moz-selection {
+  background-color: var(--color-secondary);
+  color: var(--color-secondary-content);
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;
