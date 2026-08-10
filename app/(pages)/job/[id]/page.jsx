@@ -58,18 +58,18 @@ const JobPage = () => {
 	if (currentPages.length > 0) {
 		return (
 			<div
-				className={`flex flex-col h-full min-h-0 text-base-content ${
+				className={`flex flex-col h-full min-h-0 overflow-hidden text-base-content ${
 					focusedPage ? 'invisible h-0 overflow-hidden pointer-events-none' : ''
 				}`}
 				aria-hidden={focusedPage ? true : undefined}>
-				<div className='flex-1 min-h-0 grid grid-rows-[auto_1fr] grid-cols-1 lg:grid-cols-[250px_auto]'>
+				<div className='grid min-h-0 flex-1 grid-rows-[auto_1fr] grid-cols-1 lg:grid-cols-[250px_auto]'>
 					<TopBarJobDesktop />
 
 					<div className='hidden lg:flex flex-col row-span-1 bg-base-200 pt-4 min-h-0 overflow-y-auto'>
 						<SideBar />
 					</div>
 
-					<div className='row-span-1 col-span-1 bg-base-200 p-4 overflow-hidden min-h-0'>
+					<div className='row-span-1 col-span-1 flex min-h-0 flex-col overflow-hidden bg-base-200 p-4'>
 						<PageList />
 					</div>
 				</div>

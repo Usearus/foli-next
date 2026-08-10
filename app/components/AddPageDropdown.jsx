@@ -2,36 +2,34 @@
 
 import { PlusIcon } from '@radix-ui/react-icons';
 import { useAddPage } from '../hooks/useAddPage';
-import AddPageModal from './AddPageModal';
 import TemplateSidePanel from './TemplateSidePanel';
+import AiAssistModal from './AiAssistModal';
 
 const AddPageDropdown = () => {
 	const {
-		isModalOpen,
-		setIsModalOpen,
 		isTemplatePanelOpen,
 		setIsTemplatePanelOpen,
-		validated,
-		titleRef,
-		titleMaxChar,
-		handleSubmit,
-		openBlankPageModal,
 		openTemplatePanel,
+		openAiModal,
+		isAiModalOpen,
+		setIsAiModalOpen,
+		handleCreateAiPage,
+		currentJob,
+		addBlankPage,
 	} = useAddPage();
 
 	return (
 		<>
-			<AddPageModal
-				isOpen={isModalOpen}
-				onClose={() => setIsModalOpen(false)}
-				validated={validated}
-				titleRef={titleRef}
-				titleMaxChar={titleMaxChar}
-				onSubmit={handleSubmit}
-			/>
 			<TemplateSidePanel
 				isOpen={isTemplatePanelOpen}
 				onClose={() => setIsTemplatePanelOpen(false)}
+			/>
+			<AiAssistModal
+				isOpen={isAiModalOpen}
+				onClose={() => setIsAiModalOpen(false)}
+				mode='create'
+				jobId={currentJob?.id}
+				onCreatePage={handleCreateAiPage}
 			/>
 			<div className='dropdown dropdown-bottom dropdown-end'>
 				<div tabIndex={0} role='button' className='btn btn-primary rounded-full m-1'>
@@ -42,7 +40,7 @@ const AddPageDropdown = () => {
 					tabIndex={0}
 					className='dropdown-content menu bg-base-100 rounded-box z-10 w-52 p-2 shadow'>
 					<li>
-						<button type='button' onClick={openBlankPageModal}>
+						<button type='button' onClick={addBlankPage}>
 							Blank page
 						</button>
 					</li>
@@ -51,8 +49,10 @@ const AddPageDropdown = () => {
 							Use template
 						</button>
 					</li>
-					<li className='disabled'>
-						<button type='button'>Use AI assistant</button>
+					<li>
+						<button type='button' onClick={openAiModal}>
+							Use AI assistant
+						</button>
 					</li>
 				</ul>
 			</div>

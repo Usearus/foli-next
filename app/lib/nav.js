@@ -1,7 +1,7 @@
 export const mainNavItems = [
 	{
 		href: '/',
-		label: 'Jobs',
+		label: 'Tracker',
 		id: 'jobs',
 		match: (pathname) => pathname === '/',
 	},

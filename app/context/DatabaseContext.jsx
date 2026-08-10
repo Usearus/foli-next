@@ -376,6 +376,12 @@ const DatabaseProvider = ({ children }) => {
 	const [currentPages, setCurrentPages] = useState([]);
 	const [currentJob, setCurrentJob] = useState(null);
 	const [selectedPageID, setSelectedPageID] = useState(null); // used to select a page to scroll to on page list
+	const [pendingEditPageId, setPendingEditPageId] = useState(null);
+	const [scrollPageListToEndRequest, setScrollPageListToEndRequest] =
+		useState(0);
+	const requestScrollPageListToEnd = useCallback(() => {
+		setScrollPageListToEndRequest((count) => count + 1);
+	}, []);
 	const [isJobLoading, setIsJobLoading] = useState(false);
 	const [loadingJobId, setLoadingJobId] = useState(null);
 	const openingJobIdRef = useRef(null);
@@ -477,6 +483,10 @@ const DatabaseProvider = ({ children }) => {
 				fetchCurrentPages,
 				selectedPageID,
 				setSelectedPageID,
+				pendingEditPageId,
+				setPendingEditPageId,
+				requestScrollPageListToEnd,
+				scrollPageListToEndRequest,
 				//Jobs
 				allJobs,
 				userJobs,

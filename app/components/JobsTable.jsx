@@ -7,10 +7,14 @@ import {
 } from '@radix-ui/react-icons';
 import JobsTableRow from './JobsTableRow';
 
+const TABLE_HEADER_LABEL_CLASS =
+	'text-xs font-semibold uppercase tracking-wide text-base-content/60';
+
 const SortableHeader = ({
 	column,
 	label,
 	labelContent,
+	labelClassName = TABLE_HEADER_LABEL_CLASS,
 	sortColumn,
 	sortDirection,
 	onSort,
@@ -46,8 +50,8 @@ const SortableHeader = ({
 						: `Sort by ${label}`
 				}
 			/>
-			<div className='relative z-10 flex items-center gap-1 px-4 py-3 font-semibold pointer-events-none group-hover:text-primary transition-colors'>
-				<span>{labelContent ?? label}</span>
+			<div className='relative z-10 flex items-center gap-1 px-4 py-3 pointer-events-none group-hover:text-primary transition-colors'>
+				<span className={labelClassName}>{labelContent ?? label}</span>
 				{sortIndicator}
 				{children}
 			</div>
@@ -58,11 +62,11 @@ const SortableHeader = ({
 const JobsTable = ({ jobs, sortColumn, sortDirection, onSort }) => {
 	return (
 		<table className='table table-md w-full rounded-none text-base-content'>
-			<thead className='text-base'>
+			<thead>
 				<tr>
 					<SortableHeader
 						column='job'
-						label='Job'
+						label='Application'
 						sortColumn={sortColumn}
 						sortDirection={sortDirection}
 						onSort={onSort}
@@ -91,7 +95,7 @@ const JobsTable = ({ jobs, sortColumn, sortDirection, onSort }) => {
 						onSort={onSort}
 						className='hidden lg:table-cell'
 						renderSortIndicator={(direction) => (
-							<span className='shrink-0'>
+							<span className='shrink-0 text-xs font-semibold uppercase tracking-wide text-base-content/60'>
 								{direction === 'asc' ? '(Remote first)' : '(City first)'}
 							</span>
 						)}

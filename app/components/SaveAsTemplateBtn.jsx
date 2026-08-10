@@ -1,5 +1,6 @@
 'use client';
 
+import { CopyIcon } from '@radix-ui/react-icons';
 import { useContext, useEffect, useRef, useState } from 'react';
 import { DatabaseContext } from '../context/DatabaseContext';
 import useAlert from '../alerts/useAlert';
@@ -117,7 +118,8 @@ const SaveAsTemplateBtn = ({ page, content, getDefaultTitle }) => {
 
 	return (
 		<>
-			<button type='button' onClick={handleOpen}>
+			<button type='button' className='flex items-center' onClick={handleOpen}>
+				<CopyIcon className='inline-block size-4 mr-2 shrink-0' />
 				Save as template
 			</button>
 

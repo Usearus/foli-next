@@ -5,8 +5,8 @@ import { createPortal } from 'react-dom';
 import { PlusIcon } from '@radix-ui/react-icons';
 import { useFocusMode } from '../context/FocusModeContext';
 import { useAddPage } from '../hooks/useAddPage';
-import AddPageModal from './AddPageModal';
 import TemplateSidePanel from './TemplateSidePanel';
+import AiAssistModal from './AiAssistModal';
 
 const AddPageFab = () => {
 	const { focusPageId } = useFocusMode();
@@ -14,16 +14,15 @@ const AddPageFab = () => {
 	const [isMounted, setIsMounted] = useState(false);
 	const fabTriggerRef = useRef(null);
 	const {
-		isModalOpen,
-		setIsModalOpen,
 		isTemplatePanelOpen,
 		setIsTemplatePanelOpen,
-		validated,
-		titleRef,
-		titleMaxChar,
-		handleSubmit,
-		openBlankPageModal,
 		openTemplatePanel,
+		openAiModal,
+		isAiModalOpen,
+		setIsAiModalOpen,
+		handleCreateAiPage,
+		currentJob,
+		addBlankPage,
 	} = useAddPage();
 
 	useEffect(() => {
@@ -57,12 +56,17 @@ const AddPageFab = () => {
 
 	const handleBlankPage = () => {
 		closeFab();
-		openBlankPageModal();
+		addBlankPage();
 	};
 
 	const handleTemplate = () => {
 		closeFab();
 		openTemplatePanel();
+	};
+
+	const handleAiAssistant = () => {
+		closeFab();
+		openAiModal();
 	};
 
 	const handleTriggerKeyDown = (event) => {
@@ -82,17 +86,16 @@ const AddPageFab = () => {
 
 	return (
 		<>
-			<AddPageModal
-				isOpen={isModalOpen}
-				onClose={() => setIsModalOpen(false)}
-				validated={validated}
-				titleRef={titleRef}
-				titleMaxChar={titleMaxChar}
-				onSubmit={handleSubmit}
-			/>
 			<TemplateSidePanel
 				isOpen={isTemplatePanelOpen}
 				onClose={() => setIsTemplatePanelOpen(false)}
+			/>
+			<AiAssistModal
+				isOpen={isAiModalOpen}
+				onClose={() => setIsAiModalOpen(false)}
+				mode='create'
+				jobId={currentJob?.id}
+				onCreatePage={handleCreateAiPage}
 			/>
 			{isMounted && isFabOpen
 				? createPortal(
@@ -142,13 +145,13 @@ const AddPageFab = () => {
 						T
 					</button>
 				</div>
-				<div className='opacity-50'>
+				<div>
 					Use AI assistant{' '}
 					<button
 						type='button'
 						className='btn btn-lg btn-circle'
-						disabled
-						aria-label='Use AI assistant (coming soon)'>
+						onClick={handleAiAssistant}
+						aria-label='Create page with AI assistant'>
 						A
 					</button>
 				</div>

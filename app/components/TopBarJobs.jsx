@@ -8,7 +8,7 @@ const TopBarJobs = () => {
 			<div className='max-w-7xl mx-auto w-full flex items-center justify-between'>
 				<div>
 					<p className='text-base md:text-xl font-bold whitespace-nowrap overflow-hidden text-ellipsis'>
-						Jobs
+						Application tracker
 					</p>
 				</div>
 				<AddJobBtn />

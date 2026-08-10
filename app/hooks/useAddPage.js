@@ -1,10 +1,12 @@
 'use client';
 
-import { useState, useRef, useContext } from 'react';
+import { useState, useContext } from 'react';
 import { supabase } from '../api/supabase';
 import { DEFAULT_USER } from '../config/user';
 import { DatabaseContext } from '../context/DatabaseContext';
 import useAlert from '../alerts/useAlert';
+import { PAGE_TITLE_MAX_CHAR } from '../lib/ai/pageTitle';
+import { DEFAULT_PAGE_WIDTH } from '../lib/pageDefaults';
 
 export function useAddPage() {
 	const {
@@ -12,28 +14,16 @@ export function useAddPage() {
 		currentPages,
 		fetchCurrentPages,
 		setSelectedPageID,
+		setPendingEditPageId,
+		requestScrollPageListToEnd,
 	} = useContext(DatabaseContext);
 	const { setAlert } = useAlert();
 
-	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [isTemplatePanelOpen, setIsTemplatePanelOpen] = useState(false);
-	const [validated, setValidated] = useState(false);
-	const titleRef = useRef(null);
-	const titleMaxChar = 32;
+	const [isAiModalOpen, setIsAiModalOpen] = useState(false);
+	const titleMaxChar = PAGE_TITLE_MAX_CHAR;
 
-	const handleSubmit = (event) => {
-		event.preventDefault();
-		event.stopPropagation();
-		const form = event.currentTarget;
-		if (form.checkValidity() === true) {
-			setValidated(false);
-			handleAddPageClick();
-		} else {
-			setValidated(true);
-		}
-	};
-
-	const handleAddPageClick = async () => {
+	const addBlankPage = async () => {
 		if (!currentJob) {
 			return;
 		}
@@ -42,10 +32,11 @@ export function useAddPage() {
 			.from('pages')
 			.insert({
 				account: DEFAULT_USER.email,
-				title: titleRef.current.value,
+				title: '',
 				jobid: currentJob.id,
 				position: currentPages.length,
 				isNote: false,
+				width: DEFAULT_PAGE_WIDTH,
 			})
 			.select();
 
@@ -55,23 +46,54 @@ export function useAddPage() {
 			return;
 		}
 
-		setAlert('Page added', 'success');
-		fetchCurrentPages(currentJob);
 		const newPageId = data[0].id;
+		await fetchCurrentPages(currentJob);
 		setSelectedPageID(newPageId);
-		setIsModalOpen(false);
+		setPendingEditPageId(newPageId);
+		requestScrollPageListToEnd();
+	};
+
+	const handleCreateAiPage = async ({ title, content }) => {
+		if (!currentJob) {
+			return;
+		}
+
+		const { data, error } = await supabase
+			.from('pages')
+			.insert({
+				account: DEFAULT_USER.email,
+				title: title.slice(0, titleMaxChar),
+				content,
+				jobid: currentJob.id,
+				position: currentPages.length,
+				isNote: false,
+				width: DEFAULT_PAGE_WIDTH,
+			})
+			.select();
+
+		if (error) {
+			setAlert('Unable to create page', 'error');
+			console.log(error);
+			throw error;
+		}
+
+		setAlert('Page created', 'success');
+		await fetchCurrentPages(currentJob);
+		if (data?.[0]?.id) {
+			setSelectedPageID(data[0].id);
+		}
+		setIsAiModalOpen(false);
 	};
 
 	return {
-		isModalOpen,
-		setIsModalOpen,
+		currentJob,
 		isTemplatePanelOpen,
 		setIsTemplatePanelOpen,
-		validated,
-		titleRef,
-		titleMaxChar,
-		handleSubmit,
-		openBlankPageModal: () => setIsModalOpen(true),
+		isAiModalOpen,
+		setIsAiModalOpen,
+		handleCreateAiPage,
+		addBlankPage,
 		openTemplatePanel: () => setIsTemplatePanelOpen(true),
+		openAiModal: () => setIsAiModalOpen(true),
 	};
 }

@@ -7,7 +7,7 @@ const Modal = ({ isOpen, onClose, children, title, closeButton = true }) => {
 	if (!isOpen) return null;
 
 	const modalContent = (
-		<div className='z-50 fixed inset-0 bg-black/40 flex items-center justify-center'>
+		<div className='z-110 fixed inset-0 bg-black/40 flex items-center justify-center'>
 			<div className='bg-base-100 p-6 rounded-2xl shadow-sm w-full max-w-[95vw] md:max-w-150'>
 				<div className='flex justify-between items-center'>
 					<h2 className='text-xl font-semibold py-1'>{title}</h2>

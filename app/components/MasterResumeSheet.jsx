@@ -3,12 +3,14 @@
 import { useEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import useAlert from '../alerts/useAlert';
-import { DEFAULT_USER } from '../config/user';
 import {
 	duplicateMasterResumeForJob,
 	getMasterResumeContent,
 	updateMasterResumeTemplate,
 } from '../lib/masterResumeTemplate';
+import AiAssistBtn from './AiAssistBtn';
+import Modal from './Modal';
+import { DEFAULT_USER } from '../config/user';
 
 const ReactQuillEditor = dynamic(() => import('./ReactQuillEditor'), {
 	ssr: false,
@@ -19,27 +21,28 @@ const EDIT_TRANSITION_MS = 400;
 const MasterResumeSheet = ({
 	template,
 	selectedJob,
+	editing,
+	isTailoring = false,
+	onEditingChange,
 	onTemplateUpdate,
 }) => {
 	const { setAlert } = useAlert();
 
-	const [editing, setEditing] = useState(false);
-	const [isDuplicating, setIsDuplicating] = useState(false);
 	const [isFooterExiting, setIsFooterExiting] = useState(false);
+	const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+	const [isAddingToJob, setIsAddingToJob] = useState(false);
 	const wasEditingRef = useRef(false);
-	const editingRef = useRef(editing);
-	editingRef.current = editing;
 
 	const savedContent = getMasterResumeContent(template);
 	const [content, setContent] = useState(savedContent);
 
 	useEffect(() => {
-		if (editingRef.current) {
+		if (editing) {
 			return;
 		}
 
 		setContent(savedContent);
-	}, [savedContent]);
+	}, [savedContent, editing]);
 
 	useEffect(() => {
 		if (editing) {
@@ -79,9 +82,13 @@ const MasterResumeSheet = ({
 
 	const showFooter = editing || isFooterExiting;
 
+	const stopEditing = () => {
+		onEditingChange?.(false);
+	};
+
 	const handleCancelClick = () => {
 		setContent(savedContent);
-		setEditing(false);
+		stopEditing();
 	};
 
 	const handleSaveClick = async () => {
@@ -103,33 +110,41 @@ const MasterResumeSheet = ({
 
 		setAlert('Resume saved', 'success');
 		onTemplateUpdate?.(data);
-		setEditing(false);
+		stopEditing();
 	};
 
-	const handleDuplicateClick = async () => {
+	const handleAiApply = (html) => {
+		setContent(html);
+		onEditingChange?.(true);
+	};
+
+	const handleAddToJobClick = () => {
 		if (!selectedJob?.id) {
 			setAlert('Select a job first', 'warning');
 			return;
 		}
 
-		if (editing) {
-			setAlert('Save or cancel your edits before duplicating', 'warning');
+		setIsAddModalOpen(true);
+	};
+
+	const handleConfirmAddToJob = async () => {
+		if (!selectedJob?.id) {
 			return;
 		}
 
-		setIsDuplicating(true);
+		setIsAddingToJob(true);
 
 		const { error } = await duplicateMasterResumeForJob({
 			jobId: selectedJob.id,
 			account: DEFAULT_USER.email,
-			content: savedContent,
+			content,
 		});
 
-		setIsDuplicating(false);
+		setIsAddingToJob(false);
 
 		if (error) {
 			console.error(error);
-			setAlert('Unable to duplicate resume for this job', 'error');
+			setAlert('Unable to add resume to this job', 'error');
 			return;
 		}
 
@@ -137,51 +152,59 @@ const MasterResumeSheet = ({
 			`Resume added to ${selectedJob.company} — ${selectedJob.position}`,
 			'success',
 		);
+		setIsAddModalOpen(false);
+		stopEditing();
 	};
 
 	return (
-		<article className='page-sheet-container bg-base-100 h-full w-full min-h-0 p-8 flex flex-col gap-2 shadow-sm'>
-			<div className='flex flex-col gap-3 shrink-0 pt-2'>
-				<div className='flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between'>
-					<span className='page-sheet-title font-bold pl-6'>Master Resume</span>
-					{!editing ? (
-						<div className='flex flex-wrap gap-2 px-6 sm:px-0 sm:pr-0 sm:justify-end'>
-							<button
-								type='button'
-								className='btn btn-outline btn-sm sm:btn-md'
-								onClick={handleDuplicateClick}
-								disabled={!selectedJob || isDuplicating}>
-								{isDuplicating ? (
-									<span className='loading loading-spinner loading-sm' />
-								) : null}
-								Duplicate for job
-							</button>
-							<button
-								type='button'
-								className='btn btn-primary btn-sm sm:btn-md rounded-full'
-								onClick={() => setEditing(true)}>
-								Edit master resume
-							</button>
-						</div>
-					) : null}
+		<>
+			<Modal
+				isOpen={isAddModalOpen}
+				onClose={() => {
+					if (isAddingToJob) return;
+					setIsAddModalOpen(false);
+				}}
+				title='Add resume to job'>
+				<div className='flex flex-col gap-4'>
+					<p className='text-base-content/80'>
+						This resume will be added as a new page on:
+					</p>
+					<p className='text-lg font-semibold'>
+						{selectedJob?.company} — {selectedJob?.position}
+					</p>
+					<div className='flex justify-end gap-2 pt-2'>
+						<button
+							type='button'
+							className='btn btn-ghost'
+							onClick={() => setIsAddModalOpen(false)}
+							disabled={isAddingToJob}>
+							Cancel
+						</button>
+						<button
+							type='button'
+							className='btn btn-primary'
+							onClick={handleConfirmAddToJob}
+							disabled={isAddingToJob}>
+							{isAddingToJob ? (
+								<span className='loading loading-spinner loading-sm' />
+							) : null}
+							Confirm
+						</button>
+					</div>
 				</div>
-				{!editing ? (
-					selectedJob ? (
-						<div
-							className='mx-6 rounded-lg border border-base-300 bg-base-200/60 px-3 py-2 text-sm'
-							role='status'>
-							<span className='text-base-content/60'>Duplicate target: </span>
-							<span className='font-medium'>
-								{selectedJob.company} — {selectedJob.position}
-							</span>
-						</div>
-					) : (
-						<p className='text-sm text-base-content/60 px-6'>
-							Select a job in the panel on the left to choose where a duplicate
-							Resume page will be added.
-						</p>
-					)
-				) : null}
+			</Modal>
+			<article className='page-sheet-container bg-base-100 h-full w-full min-h-0 max-w-full p-8 flex flex-col gap-2 shadow-sm'>
+			<div className='page-sheet-header flex items-center gap-1 pt-2 min-w-0'>
+				<span className='page-sheet-title font-bold pl-6 flex-1 min-w-0'>
+					Master Resume
+				</span>
+				<div className='page-sheet-actions shrink-0 flex justify-end gap-0 z-30 pr-6 sm:pr-0'>
+					<AiAssistBtn
+						templateId={template?.id}
+						jobId={selectedJob?.id}
+						onApply={handleAiApply}
+					/>
+				</div>
 			</div>
 			<div className='border-t border-base-content/10' aria-hidden='true' />
 
@@ -218,15 +241,16 @@ const MasterResumeSheet = ({
 						</button>
 						<button
 							type='button'
-							className='btn btn-primary rounded-full w-fit'
-							onClick={handleSaveClick}
+							className='btn btn-primary w-fit'
+							onClick={isTailoring ? handleAddToJobClick : handleSaveClick}
 							tabIndex={isFooterExiting ? -1 : 0}>
-							Save resume
+							{isTailoring ? 'Add resume to job' : 'Save resume'}
 						</button>
 					</div>
 				) : null}
 			</div>
 		</article>
+		</>
 	);
 };
 

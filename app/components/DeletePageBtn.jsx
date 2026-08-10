@@ -1,5 +1,6 @@
 'use client';
 
+import { TrashIcon } from '@radix-ui/react-icons';
 import { useState, useContext } from 'react';
 import { DatabaseContext } from '../context/DatabaseContext';
 import useAlert from '../alerts/useAlert';
@@ -27,8 +28,9 @@ const DeletePageBtn = ({ page }) => {
 		<>
 			<button
 				type='button'
-				className='text-error text-sm'
+				className='flex items-center text-error text-sm'
 				onClick={() => setIsModalOpen(true)}>
+				<TrashIcon className='inline-block size-4 mr-2 shrink-0' />
 				Delete
 			</button>
 

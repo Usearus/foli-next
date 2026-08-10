@@ -92,13 +92,13 @@ const AddJobBtn = () => {
 				className='btn btn-primary rounded-full'
 				onClick={() => setIsModalOpen(true)}>
 				<PlusIcon className='size-4 shrink-0' />
-				Add job
+				Add application
 			</button>
 
 			<Modal
 				isOpen={isModalOpen}
 				onClose={() => setIsModalOpen(false)}
-				title='Add job'>
+				title='Add application'>
 				<form
 					className={`flex flex-col gap-4 ${validated ? 'was-validated' : ''}`}
 					onSubmit={handleSubmit}

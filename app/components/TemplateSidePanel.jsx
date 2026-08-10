@@ -13,6 +13,7 @@ import { updateCustomTemplate } from '../lib/savePageAsTemplate';
 import SidePanel from './SidePanel';
 import DeleteTemplateButton from './DeleteTemplateButton';
 import { filterTemplatesForJobStage } from '../lib/templateStageMapping';
+import { DEFAULT_PAGE_WIDTH } from '../lib/pageDefaults';
 
 const ReactQuillEditor = dynamic(() => import('./ReactQuillEditor'), {
 	ssr: false,
@@ -255,6 +256,7 @@ const TemplateSidePanel = ({ isOpen, onClose }) => {
 				content: activeTemplate.content,
 				jobid: currentJob.id,
 				position: currentPages.length,
+				width: DEFAULT_PAGE_WIDTH,
 			})
 			.select();
 

@@ -4,6 +4,7 @@ import { DatabaseContext } from '../context/DatabaseContext';
 import { EyeOpenIcon, EyeClosedIcon } from '@radix-ui/react-icons';
 import { supabase } from '../api/supabase';
 import DeletePageIcon from './DeletePageIcon';
+import { getPageTitleLabel, isPageTitleEmpty } from '../lib/ai/pageTitle';
 
 const SideBarItem = ({ page, setShowOffcanvas, showOffcanvas }) => {
 	const { fetchCurrentPages, currentJob, setSelectedPageID } =
@@ -34,8 +35,10 @@ const SideBarItem = ({ page, setShowOffcanvas, showOffcanvas }) => {
 				<div className='flex justify-between items-center pr-1 w-full'>
 					<p
 						onClick={handleSideBarItemClick}
-						className='max-w-[75%] text-base whitespace-nowrap overflow-hidden text-ellipsis'>
-						{page.title}
+						className={`max-w-[75%] text-base whitespace-nowrap overflow-hidden text-ellipsis ${
+							isPageTitleEmpty(page.title) ? 'text-base-content/50' : ''
+						}`}>
+						{getPageTitleLabel(page.title)}
 					</p>
 					<div className='flex gap-1'>
 						{page.locked ? null : <DeletePageIcon page={page} />}

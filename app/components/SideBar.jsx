@@ -59,7 +59,7 @@ const SideBar = () => {
 	return (
 		<div className='scroll-container'>
 			{jobDescriptionPage ? (
-				<div className='mb-2'>
+				<div className='mb-0'>
 					<SideBarItem page={jobDescriptionPage} />
 				</div>
 			) : null}
@@ -75,7 +75,7 @@ const SideBar = () => {
 						<div
 							{...provided.droppableProps}
 							ref={provided.innerRef}
-							className={`draggable-area flex flex-col gap-2 rounded-xl transition-colors duration-150${isDragging ? ' dragging' : ''}`}>
+							className={`draggable-area flex flex-col gap-0 rounded-xl transition-colors duration-150${isDragging ? ' dragging' : ''}`}>
 							{draggablePages.map((page, index) => (
 								<Draggable
 									key={page.id}

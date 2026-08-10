@@ -17,11 +17,14 @@ npm install
 
 ### Environment variables
 
-Create a `.env.local` file in the project root:
+Create a `.env.local` file in the project root (copy from `.env.example`):
 
 ```bash
 NEXT_PUBLIC_SUPABASE_KEY=your_supabase_anon_key
+OPENAI_API_KEY=sk-your_openai_api_key
 ```
+
+`OPENAI_API_KEY` is server-only. Do not prefix it with `NEXT_PUBLIC_` or it will be exposed to the browser.
 
 ### Run the development server
 
