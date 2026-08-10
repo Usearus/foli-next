@@ -7,20 +7,20 @@ import ContentLoader from '../../components/ContentLoader';
 import TopBarMyQuestions from '../../components/TopBarMyQuestions';
 import EmployerQuestionList from '../../components/EmployerQuestionList';
 import {
-	copyEmployerQuestionsToClipboard,
-	getSelectedEmployerQuestionIds,
-	setSelectedEmployerQuestionIds,
-	isEmployerQuestion,
-} from '../../lib/employerQuestions';
+	copyMyQuestionsToClipboard,
+	getSelectedMyQuestionIds,
+	isMyQuestion,
+	setSelectedMyQuestionIds,
+} from '../../lib/questions';
 
 const MyQuestionsPage = () => {
 	const { userQuestions, isQuestionsLoading } = useContext(DatabaseContext);
 	const { setAlert } = useAlert();
-	const [selectedIds, setSelectedIds] = useState(getSelectedEmployerQuestionIds);
+	const [selectedIds, setSelectedIds] = useState(getSelectedMyQuestionIds);
 
 	const handleSelectionChange = useCallback((ids) => {
 		setSelectedIds(ids);
-		setSelectedEmployerQuestionIds(ids);
+		setSelectedMyQuestionIds(ids);
 	}, []);
 
 	const handleToggle = useCallback(
@@ -35,7 +35,7 @@ const MyQuestionsPage = () => {
 	);
 
 	const employerQuestions = useMemo(
-		() => (userQuestions || []).filter(isEmployerQuestion),
+		() => (userQuestions || []).filter(isMyQuestion),
 		[userQuestions],
 	);
 
@@ -51,7 +51,7 @@ const MyQuestionsPage = () => {
 		}
 
 		try {
-			await copyEmployerQuestionsToClipboard(selectedQuestions);
+			await copyMyQuestionsToClipboard(selectedQuestions);
 			setAlert('Copied — paste into a job page sheet', 'success');
 		} catch (error) {
 			console.log(error);

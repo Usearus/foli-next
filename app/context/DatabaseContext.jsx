@@ -2,6 +2,7 @@
 
 import { createContext, useState, useEffect } from 'react';
 import { supabase } from '../api/supabase';
+import { applyTheme } from '../lib/theme';
 import { DEFAULT_USER } from '../config/user';
 
 const DatabaseContext = createContext();
@@ -81,7 +82,6 @@ const DatabaseProvider = ({ children }) => {
 	const [userPages, setUserPages] = useState([]);
 	const [settingPageStack, setSettingPageStack] = useState('');
 	const [userResume, setUserResume] = useState([]);
-	const [userSnippets, setUserSnippets] = useState([]);
 	const [userQuestions, setUserQuestions] = useState([]);
 	const [isQuestionsLoading, setIsQuestionsLoading] = useState(true);
 
@@ -103,7 +103,7 @@ const DatabaseProvider = ({ children }) => {
 			if (data) {
 				setUserProfile(data);
 				setUserTheme(data.theme);
-				document.documentElement.setAttribute('data-theme', data.theme);
+				applyTheme(data.theme);
 
 				setSettingPageStack(data.page_stack);
 				// console.log('userProfile is', data);
@@ -325,24 +325,12 @@ const DatabaseProvider = ({ children }) => {
 		}
 	}
 
-	async function fetchUserSnippets() {
-		if (userEmail) {
-			const { data } = await supabase
-				.from('snippets')
-				.select('*')
-				.filter('account', 'eq', userEmail);
-			if (data) {
-				setUserSnippets(data);
-				// console.log('userSnippets are', data);
-			}
-		}
-	}
-
 	async function fetchUserQuestions() {
 		const { data, error } = await supabase
 			.from('questions')
 			.select('*')
 			.order('id', { ascending: false });
+
 		if (data) {
 			setUserQuestions(data);
 		}
@@ -364,7 +352,6 @@ const DatabaseProvider = ({ children }) => {
 					fetchUserJobsClosed(),
 					fetchUserPages(),
 					fetchUserResume(),
-					fetchUserSnippets(),
 					fetchUserQuestions(),
 				]);
 			} finally {
@@ -485,9 +472,6 @@ const DatabaseProvider = ({ children }) => {
 				// Resumes
 				userResume,
 				fetchUserResume,
-				// Snippets
-				userSnippets,
-				fetchUserSnippets,
 				// Settings
 				settingPageStack,
 				setSettingPageStack,

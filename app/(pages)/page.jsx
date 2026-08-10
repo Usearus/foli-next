@@ -2,46 +2,45 @@
 
 import { useContext } from 'react';
 import { DatabaseContext } from '../context/DatabaseContext';
-import JobsTable from '../components/JobsTable';
-import AddJobBtn from '../components/AddJobBtn';
+import PaginatedJobsTable from '../components/PaginatedJobsTable';
+import TopBarJobs from '../components/TopBarJobs';
 
 const Page = () => {
 	const { userJobs, userJobsClosed } = useContext(DatabaseContext);
 
 	return (
-		<div className='p-0 pt-6 lg:p-12 flex flex-col h-full'>
-			<div className='flex items-center justify-between mb-4 px-4 lg:px-0'>
-				<div>
-					<p className='text-base md:text-xl font-bold'>Jobs</p>
-					<p className='text-sm hidden md:block opacity-70'>
-						View jobs within your job search.
-					</p>
-				</div>
-				<AddJobBtn />
-			</div>
+		<div className='flex flex-col h-full text-base-content'>
+			<TopBarJobs />
+			<div className='flex-grow overflow-y-auto flex flex-col'>
+				<div className='max-w-7xl mx-auto w-full py-4 flex flex-col'>
+					<div role='tablist' className='tabs tabs-box w-full p-0'>
+						<input
+							type='radio'
+							name='jobs_tabs'
+							role='tab'
+							className='tab'
+							aria-label='Active'
+							defaultChecked
+						/>
+						<div
+							role='tabpanel'
+							className='tab-content bg-base-100 rounded-lg overflow-visible'>
+							<PaginatedJobsTable jobs={userJobs} />
+						</div>
 
-			<div role='tablist' className='tabs tabs-bordered px-4 lg:px-0'>
-				<input
-					type='radio'
-					name='my_tabs_1'
-					role='tab'
-					className='tab'
-					aria-label='Active'
-					defaultChecked
-				/>
-				<div role='tabpanel' className='tab-content pt-4'>
-					<JobsTable jobs={userJobs} />
-				</div>
-
-				<input
-					type='radio'
-					name='my_tabs_1'
-					role='tab'
-					className='tab'
-					aria-label='Closed'
-				/>
-				<div role='tabpanel' className='tab-content pt-4'>
-					<JobsTable jobs={userJobsClosed} />
+						<input
+							type='radio'
+							name='jobs_tabs'
+							role='tab'
+							className='tab'
+							aria-label='Closed'
+						/>
+						<div
+							role='tabpanel'
+							className='tab-content bg-base-100 rounded-lg overflow-visible'>
+							<PaginatedJobsTable jobs={userJobsClosed} />
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>

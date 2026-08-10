@@ -32,12 +32,12 @@ const SidePanel = ({
 			className='z-50 fixed inset-0 bg-[#0f1214] bg-opacity-70 flex justify-end animate-fade-in'
 			onClick={onClose}>
 			<div
-				className={`w-full bg-base-300 p-4 lg:p-6 shadow-sm max-w-[700px] h-full ${animation}`}
+				className={`w-full bg-base-100 p-4 lg:p-6 shadow-sm max-w-[700px] h-full ${animation}`}
 				onClick={(event) => event.stopPropagation()}>
 				<div className='flex justify-between items-center pb-4'>
 					<h2 className='text-xl font-semibold py-1'>{title}</h2>
 					{closeButton ? (
-						<button type='button' className='btn btn-sm btn-ghost' onClick={onClose}>
+						<button type='button' className='btn btn-ghost' onClick={onClose}>
 							<Cross1Icon />
 						</button>
 					) : null}

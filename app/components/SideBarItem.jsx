@@ -28,13 +28,13 @@ const SideBarItem = ({ page, setShowOffcanvas, showOffcanvas }) => {
 	};
 
 	return (
-		<ul className='py-0 menu menu-sm bg-base-200 rounded-lg w-full'>
+		<ul className='menu bg-base-200 rounded-lg w-full py-0'>
 			{/* Add the 'group' class */}
 			<li className='w-full group'>
 				<div className='flex justify-between items-center pr-1 w-full'>
 					<p
 						onClick={handleSideBarItemClick}
-						className='max-w-[75%] whitespace-nowrap overflow-hidden text-ellipsis'>
+						className='max-w-[75%] text-base whitespace-nowrap overflow-hidden text-ellipsis'>
 						{page.title}
 					</p>
 					<div className='flex gap-1'>
@@ -42,7 +42,7 @@ const SideBarItem = ({ page, setShowOffcanvas, showOffcanvas }) => {
 						<div
 							role='button'
 							onClick={handleVisibilityClick}
-							className='btn btn-xs'>
+							className='btn btn-ghost'>
 							{page.visible ? <EyeOpenIcon /> : <EyeClosedIcon />}
 						</div>
 					</div>

@@ -9,7 +9,6 @@ import dynamic from 'next/dynamic';
 const ReactQuillEditor = dynamic(() => import('./ReactQuillEditor'), {
 	ssr: false,
 });
-import MarkdownView from 'react-showdown';
 import useAlert from '../alerts/useAlert';
 import DeletePageBtn from './DeletePageBtn';
 import FocusModeOverlay from './FocusModeOverlay';
@@ -23,6 +22,7 @@ import { Resizable } from 're-resizable';
 
 const EDIT_TRANSITION_MS = 400;
 const FOCUS_MODE_MAX_WIDTH = 700;
+const RESIZE_EDGE_PX = 20;
 
 const SinglePage = (page) => {
 	// Context Variables
@@ -85,20 +85,70 @@ const SinglePage = (page) => {
 
 	// EDITING PAGE FUNCTIONS
 	const [editing, setEditing] = useState(false);
-	const [editTransition, setEditTransition] = useState(null);
-	const [showViewLayer, setShowViewLayer] = useState(true);
-	const [showEditorLayer, setShowEditorLayer] = useState(false);
+	const [isFooterExiting, setIsFooterExiting] = useState(false);
+	const wasEditingRef = useRef(false);
 	const [isMounted, setIsMounted] = useState(false);
+	const [showResizeHandle, setShowResizeHandle] = useState(false);
 
 	useEffect(() => {
 		setIsMounted(true);
 	}, []);
 
+	useEffect(() => {
+		if (!editing) {
+			setContent(page.content);
+			if (titleRef.current) {
+				titleRef.current.value = page.title ?? '';
+				setCharacterCount((page.title ?? '').length);
+			}
+		}
+	}, [page.content, page.title, editing]);
+
+	useEffect(() => {
+		if (editing) {
+			wasEditingRef.current = true;
+			setIsFooterExiting(false);
+			return;
+		}
+
+		if (!wasEditingRef.current) {
+			return;
+		}
+
+		wasEditingRef.current = false;
+		setIsFooterExiting(true);
+
+		const timer = window.setTimeout(() => {
+			setIsFooterExiting(false);
+		}, EDIT_TRANSITION_MS);
+
+		return () => window.clearTimeout(timer);
+	}, [editing]);
+
+	const showFooter = editing || isFooterExiting;
+
+	const handleSheetMouseMove = (event) => {
+		if (window.matchMedia('(max-width: 768px)').matches) {
+			return;
+		}
+
+		const bounds = sheetRef.current?.getBoundingClientRect();
+		if (!bounds) {
+			return;
+		}
+
+		const nearRightEdge =
+			event.clientX >= bounds.right - RESIZE_EDGE_PX &&
+			event.clientX <= bounds.right + 4;
+		setShowResizeHandle(nearRightEdge);
+	};
+
+	const handleSheetMouseLeave = () => {
+		setShowResizeHandle(false);
+	};
+
 	const handleEditClick = () => {
 		setEditing(true);
-		setEditTransition('enter');
-		setShowViewLayer(true);
-		setShowEditorLayer(true);
 	};
 
 	const handleFocusClick = () => {
@@ -116,33 +166,12 @@ const SinglePage = (page) => {
 		handleEditClick();
 	};
 
-	const startExitEdit = () => {
-		setShowViewLayer(true);
-		setEditTransition('exit');
+	const stopEditing = () => {
+		setEditing(false);
+		if (focusPageId === page.id) {
+			exitFocusMode();
+		}
 	};
-
-	useEffect(() => {
-		if (editTransition === 'enter') {
-			const timer = setTimeout(() => {
-				setEditTransition(null);
-				setShowViewLayer(false);
-			}, EDIT_TRANSITION_MS);
-			return () => clearTimeout(timer);
-		}
-
-		if (editTransition === 'exit') {
-			const timer = setTimeout(() => {
-				setEditing(false);
-				setEditTransition(null);
-				setShowEditorLayer(false);
-				setShowViewLayer(true);
-				if (focusPageId === page.id) {
-					exitFocusMode();
-				}
-			}, EDIT_TRANSITION_MS);
-			return () => clearTimeout(timer);
-		}
-	}, [editTransition, exitFocusMode, focusPageId, page.id]);
 
 	const handleCancelClick = () => {
 		setContent(page.content);
@@ -151,7 +180,7 @@ const SinglePage = (page) => {
 			setCharacterCount((page.title ?? '').length);
 		}
 		setShowEditPageModal(false);
-		startExitEdit();
+		stopEditing();
 	};
 
 	const closeEditorWarning = (event) => {
@@ -193,14 +222,14 @@ const SinglePage = (page) => {
 					setCharacterCount((page.title ?? '').length);
 				}
 				setShowEditPageModal(false);
-				startExitEdit();
+				stopEditing();
 			}
 		};
 
 		window.addEventListener('keydown', handleEscape);
 
 		return () => window.removeEventListener('keydown', handleEscape);
-	}, [isFocusMode, page.content]);
+	}, [isFocusMode, page.content, page.title, focusPageId, page.id, exitFocusMode]);
 
 	// React Quill Editor Variables & Functions
 	const [content, setContent] = useState(page.content);
@@ -237,7 +266,7 @@ const SinglePage = (page) => {
 			setAlert('Page updated', 'success');
 			fetchCurrentPages(currentJob);
 			setShowEditPageModal(false);
-			startExitEdit();
+			stopEditing();
 			return;
 		}
 
@@ -258,7 +287,7 @@ const SinglePage = (page) => {
 		setAlert('Page updated', 'success');
 		fetchCurrentPages(currentJob);
 		setShowEditPageModal(false);
-		startExitEdit();
+		stopEditing();
 	};
 
 	if (initialVisibleValue === false) {
@@ -266,45 +295,51 @@ const SinglePage = (page) => {
 	}
 
 	const sheetArticle = (
-		<article className='page-sheet-container bg-base-100 h-full w-full p-4 flex flex-col gap-2 shadow-sm'>
-			{editing ? (
-				<div className='flex justify-between pt-2'>
-					{page.locked ? (
-						<label className='page-sheet-title font-bold pl-4'>{page.title}</label>
-					) : (
-						<label className='input input-ghost input-xs flex grow items-center gap-2 mb-[2px] mr-2'>
-							<input
-								type='text'
-								required
-								ref={titleRef}
-								defaultValue={initialTitleValue}
-								maxLength={titleMaxChar}
-								onChange={handleTitleChange}
-								placeholder='Add page title'
-								className='grow font-bold text-xl pl-2'
-							/>
-							<span className='label-text-alt shrink-0'>
-								{characterCount}/{titleMaxChar}
-							</span>
-						</label>
-					)}
-				</div>
-			) : (
-				<div className='flex justify-between pt-2'>
-					<label className='page-sheet-title font-bold pl-4'>{page.title}</label>
-					<div className='page-sheet-actions flex justify-end gap-2'>
+		<article className='page-sheet-container bg-base-100 h-full w-full p-8 flex flex-col gap-2 shadow-sm'>
+			<div className='relative flex pt-2'>
+				{page.locked ? (
+					<label className='input input-ghost flex grow items-center gap-2 mb-[2px] mr-2 pl-6 pointer-events-none'>
+						<span className='page-sheet-title font-bold'>{page.title}</span>
+					</label>
+				) : (
+					<label
+						className={`input input-ghost flex grow items-center gap-2 mb-[2px] mr-2 pl-6 ${
+							editing ? '' : 'pointer-events-none'
+						}`}>
+						<input
+							type='text'
+							required={editing}
+							readOnly={!editing}
+							tabIndex={editing ? 0 : -1}
+							ref={titleRef}
+							defaultValue={initialTitleValue}
+							maxLength={titleMaxChar}
+							onChange={editing ? handleTitleChange : undefined}
+							placeholder={editing ? 'Add page title' : undefined}
+							className='page-sheet-title-input grow page-sheet-title font-bold pl-0'
+							aria-readonly={!editing}
+						/>
+						<span
+							className={`label shrink-0 ${editing ? '' : 'invisible'}`}
+							aria-hidden={!editing}>
+							{characterCount}/{titleMaxChar}
+						</span>
+					</label>
+				)}
+				{!editing ? (
+					<div className='page-sheet-actions absolute right-0 top-2 flex justify-end gap-0'>
 						{!isFocusMode ? (
 							<>
 								<button
 									type='button'
-									className='btn btn-xs btn-ghost'
+									className='btn btn-ghost'
 									onClick={handleFocusClick}
 									aria-label='Enter focus mode'>
 									<EnterFullScreenIcon />
 								</button>
 								<button
 									type='button'
-									className='btn btn-xs btn-ghost'
+									className='btn btn-ghost'
 									onClick={handleEditClick}
 									aria-label='Edit page'>
 									<Pencil1Icon />
@@ -313,7 +348,7 @@ const SinglePage = (page) => {
 						) : null}
 						{!page.locked && !isFocusMode ? (
 							<div className='dropdown dropdown-end'>
-								<div tabIndex={0} role='button' className='btn btn-xs btn-ghost'>
+								<div tabIndex={0} role='button' className='btn btn-ghost'>
 									<DotsVerticalIcon />
 								</div>
 								<ul
@@ -326,50 +361,49 @@ const SinglePage = (page) => {
 							</div>
 						) : null}
 					</div>
-				</div>
-			)}
+				) : null}
+			</div>
 			<div className='border-t border-base-content/10' aria-hidden='true' />
 
 			<div
-				className={`flex flex-col ${editing ? 'justify-between h-full min-h-0' : 'h-full min-h-0'}`}>
+				className={`flex flex-col ${
+					showFooter ? 'justify-between' : ''
+				} h-full min-h-0`}>
 				<div
-					className={`page-scroll page-sheet ${editing ? 'page-sheet-editing' : ''} ${
-						editTransition === 'enter' ? 'page-sheet-enter' : ''
-					} ${editTransition === 'exit' ? 'page-sheet-exit' : ''} ${
+					className={`page-scroll page-sheet ${
 						isFocusMode ? 'focus-mode-page-scroll' : ''
 					}`}>
-					{(showViewLayer || !editing) && (
-						<div
-							className={`page-sheet-view ${
-								editTransition === 'enter' ? 'page-sheet-view-exiting' : ''
-							} ${editTransition === 'exit' ? 'page-sheet-view-entering' : ''}`}>
-							<MarkdownView
-								className='markdown-content'
-								markdown={
-									editTransition === 'exit' || editing ? content : page.content
-								}
-							/>
-						</div>
-					)}
-					{showEditorLayer ? (
-						<div className='page-sheet-editor'>
-							<ReactQuillEditor value={content} onChange={handleEditorChange} />
-						</div>
-					) : null}
+					<div
+						className={`page-sheet-editor ${
+							editing ? 'page-sheet-editing-mode' : 'page-sheet-view-mode'
+						}`}>
+						<ReactQuillEditor
+							value={content}
+							onChange={handleEditorChange}
+							readOnly={!editing}
+						/>
+					</div>
 				</div>
 
-				{editing && editTransition !== 'exit' ? (
-					<div className='flex justify-end gap-2 pt-2'>
+				{showFooter ? (
+					<div
+						className={`page-sheet-footer flex justify-end gap-2 pt-2 ${
+							isFooterExiting
+								? 'page-sheet-footer-exiting pointer-events-none'
+								: 'page-sheet-footer-enter'
+						}`}>
 						<button
 							type='button'
-							className='btn btn-sm btn-ghost btn-primary w-fit'
-							onClick={handleCancelClick}>
+							className='btn btn-ghost btn-secondary w-fit'
+							onClick={handleCancelClick}
+							tabIndex={isFooterExiting ? -1 : 0}>
 							Cancel
 						</button>
 						<button
 							type='button'
-							className='btn btn-sm btn-primary w-fit'
-							onClick={handleUpdateContentClick}>
+							className='btn btn-primary rounded-full w-fit'
+							onClick={handleUpdateContentClick}
+							tabIndex={isFooterExiting ? -1 : 0}>
 							Save page
 						</button>
 					</div>
@@ -409,7 +443,17 @@ const SinglePage = (page) => {
 	}
 
 	return (
-		<div ref={sheetRef} className='h-full'>
+		<div
+			ref={sheetRef}
+			className={`h-full relative ${showResizeHandle ? 'cursor-col-resize' : ''}`}
+			onMouseMove={handleSheetMouseMove}
+			onMouseLeave={handleSheetMouseLeave}>
+			<div
+				className={`page-sheet-resize-handle ${
+					showResizeHandle ? 'page-sheet-resize-handle--visible' : ''
+				}`}
+				aria-hidden='true'
+			/>
 			<Resizable
 				enable={{
 					top: false,

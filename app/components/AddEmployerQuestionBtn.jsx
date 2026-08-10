@@ -3,18 +3,19 @@
 import { useState, useContext, useRef } from 'react';
 import { DatabaseContext } from '../context/DatabaseContext';
 import useAlert from '../alerts/useAlert';
+import { PlusIcon } from '@radix-ui/react-icons';
 import Modal from './Modal';
 import { supabase } from '../api/supabase';
 import {
-	employerCategory,
-	EMPLOYER_QUESTION_TYPES,
-} from '../lib/employerQuestions';
+	MY_QUESTION_CATEGORIES,
+	QUESTION_TYPE_MY_QUESTION,
+} from '../lib/questions';
 
 const AddEmployerQuestionBtn = () => {
 	const { fetchUserQuestions } = useContext(DatabaseContext);
 	const { setAlert } = useAlert();
 	const [isModalOpen, setIsModalOpen] = useState(false);
-	const [type, setType] = useState('Hiring manager');
+	const [category, setCategory] = useState('Hiring manager');
 	const questionRef = useRef(null);
 
 	const handleSubmit = (event) => {
@@ -30,7 +31,8 @@ const AddEmployerQuestionBtn = () => {
 		}
 
 		const { error } = await supabase.from('questions').insert({
-			category: employerCategory(type),
+			type: QUESTION_TYPE_MY_QUESTION,
+			category,
 			question,
 			response: null,
 		});
@@ -44,7 +46,7 @@ const AddEmployerQuestionBtn = () => {
 		fetchUserQuestions();
 		setAlert('Question added', 'success');
 		questionRef.current.value = '';
-		setType('Hiring manager');
+		setCategory('Hiring manager');
 		setIsModalOpen(false);
 	};
 
@@ -55,35 +57,35 @@ const AddEmployerQuestionBtn = () => {
 				onClose={() => setIsModalOpen(false)}
 				title='Add a question for the employer'>
 				<form className='flex flex-col gap-4 pb-4' onSubmit={handleSubmit}>
-					<label className='form-control w-full'>
-						<div className='label'>
-							<span className='label-text'>Type</span>
-						</div>
+					<fieldset className='fieldset'>
+						<label className='label' htmlFor='add-employer-question-category'>
+							Category
+						</label>
 						<select
-							value={type}
-							onChange={(e) => setType(e.target.value)}
-							className='select select-bordered w-full bg-base-300'>
-							{EMPLOYER_QUESTION_TYPES.map((option) => (
+							id='add-employer-question-category'
+							value={category}
+							onChange={(e) => setCategory(e.target.value)}
+							className='select w-full bg-base-200'>
+							{MY_QUESTION_CATEGORIES.map((option) => (
 								<option key={option} value={option}>
 									{option}
 								</option>
 							))}
 						</select>
-					</label>
-					<label className='form-control w-full'>
-						<div className='label'>
-							<span className='label-text'>
-								Question <span className='text-primary'>*</span>
-							</span>
-						</div>
+					</fieldset>
+					<fieldset className='fieldset'>
+						<label className='label' htmlFor='add-employer-question-text'>
+							Question <span className='text-primary'>*</span>
+						</label>
 						<textarea
+							id='add-employer-question-text'
 							required
 							ref={questionRef}
 							rows={3}
 							placeholder='e.g. What does the onboarding process look like?'
-							className='textarea textarea-bordered w-full bg-base-300'
+							className='textarea w-full bg-base-200'
 						/>
-					</label>
+					</fieldset>
 					<div className='flex justify-end pt-2'>
 						<button type='submit' className='btn btn-primary'>
 							Add question
@@ -93,8 +95,9 @@ const AddEmployerQuestionBtn = () => {
 			</Modal>
 			<button
 				type='button'
-				className='btn btn-primary btn-sm'
+				className='btn btn-primary rounded-full'
 				onClick={() => setIsModalOpen(true)}>
+				<PlusIcon className='size-4 shrink-0' />
 				Add question
 			</button>
 		</>

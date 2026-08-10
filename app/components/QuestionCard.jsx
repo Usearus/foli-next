@@ -7,12 +7,11 @@ import useAlert from '../alerts/useAlert';
 import Modal from './Modal';
 import { supabase } from '../api/supabase';
 import {
-	INTERVIEWER_CATEGORIES,
+	isStarCategory,
+	PRACTICE_CATEGORIES,
+	QUESTION_TYPE_PRACTICE,
 	STAR_ANSWER_TEMPLATE,
-} from '../lib/interviewerQuestions';
-
-const isStarCategory = (category) =>
-	category === 'Behavioral (STAR)' || category === '_Behavioral questions';
+} from '../lib/questions';
 
 const QuestionCard = ({ questionItem }) => {
 	const { fetchUserQuestions } = useContext(DatabaseContext);
@@ -22,13 +21,7 @@ const QuestionCard = ({ questionItem }) => {
 	const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 	const [question, setQuestion] = useState(questionItem.question || '');
 	const [response, setResponse] = useState(questionItem.response || '');
-	const [category, setCategory] = useState(
-		isStarCategory(questionItem.category)
-			? 'Behavioral (STAR)'
-			: questionItem.category?.startsWith('_')
-				? 'Role & skills'
-				: questionItem.category || 'General',
-	);
+	const [category, setCategory] = useState(questionItem.category || 'General');
 
 	const handleSave = async () => {
 		const trimmedQuestion = question.trim();
@@ -40,6 +33,7 @@ const QuestionCard = ({ questionItem }) => {
 		const { error } = await supabase
 			.from('questions')
 			.update({
+				type: QUESTION_TYPE_PRACTICE,
 				question: trimmedQuestion,
 				response: response.trim() || null,
 				category,
@@ -60,11 +54,7 @@ const QuestionCard = ({ questionItem }) => {
 	const handleCancel = () => {
 		setQuestion(questionItem.question || '');
 		setResponse(questionItem.response || '');
-		setCategory(
-			isStarCategory(questionItem.category)
-				? 'Behavioral (STAR)'
-				: questionItem.category || 'General',
-		);
+		setCategory(questionItem.category || 'General');
 		setEditing(false);
 	};
 
@@ -100,12 +90,7 @@ const QuestionCard = ({ questionItem }) => {
 	return (
 		<div className='bg-base-100 rounded-xl overflow-hidden shadow-sm'>
 			<div className='p-5 flex justify-between items-start gap-4'>
-				<div className='flex flex-col gap-2 min-w-0 flex-1'>
-					<span className='badge badge-neutral badge-sm w-fit'>
-						{showStarBadge
-							? 'Behavioral (STAR)'
-							: questionItem.category || 'General'}
-					</span>
+				<div className='flex flex-col min-w-0 flex-1'>
 					<h3 className='font-semibold text-base leading-snug'>
 						{questionItem.question}
 					</h3>
@@ -116,7 +101,7 @@ const QuestionCard = ({ questionItem }) => {
 							{!editing ? (
 								<button
 									type='button'
-									className='btn btn-ghost btn-xs btn-square'
+									className='btn btn-ghost btn-square'
 									onClick={startEditing}
 									aria-label='Edit question'>
 									<Pencil1Icon />
@@ -124,7 +109,7 @@ const QuestionCard = ({ questionItem }) => {
 							) : null}
 							<button
 								type='button'
-								className='btn btn-ghost btn-xs btn-square text-error'
+								className='btn btn-ghost btn-square text-error'
 								onClick={() => setIsDeleteOpen(true)}
 								aria-label='Delete question'>
 								<TrashIcon />
@@ -133,7 +118,7 @@ const QuestionCard = ({ questionItem }) => {
 					) : null}
 					<button
 						type='button'
-						className='btn btn-ghost btn-xs btn-square'
+						className='btn btn-ghost btn-square'
 						onClick={toggleExpanded}
 						disabled={editing}
 						aria-label={isExpanded ? 'Collapse question' : 'Expand question'}
@@ -151,56 +136,65 @@ const QuestionCard = ({ questionItem }) => {
 				<div className='px-5 pb-5 flex flex-col gap-3'>
 					{editing ? (
 						<div className='flex flex-col gap-3'>
-							<label className='form-control w-full'>
-								<div className='label py-0'>
-									<span className='label-text font-semibold'>Type</span>
-								</div>
+							<fieldset className='fieldset'>
+								<label
+									className='label font-semibold'
+									htmlFor={`question-type-${questionItem.id}`}>
+									Type
+								</label>
 								<select
+									id={`question-type-${questionItem.id}`}
 									value={category}
 									onChange={(e) => setCategory(e.target.value)}
-									className='select select-bordered select-sm w-full bg-base-300'>
-									{INTERVIEWER_CATEGORIES.map((option) => (
+									className='select w-full bg-base-200'>
+									{PRACTICE_CATEGORIES.map((option) => (
 										<option key={option} value={option}>
 											{option}
 										</option>
 									))}
 								</select>
-							</label>
-							<label className='form-control w-full'>
-								<div className='label py-0'>
-									<span className='label-text font-semibold'>Question</span>
-								</div>
+							</fieldset>
+							<fieldset className='fieldset'>
+								<label
+									className='label font-semibold'
+									htmlFor={`question-text-${questionItem.id}`}>
+									Question
+								</label>
 								<textarea
+									id={`question-text-${questionItem.id}`}
 									value={question}
 									onChange={(e) => setQuestion(e.target.value)}
 									rows={3}
-									className='textarea textarea-bordered w-full bg-base-300'
+									className='textarea w-full bg-base-200'
 								/>
-							</label>
-							<label className='form-control w-full'>
-								<div className='label py-0'>
-									<span className='label-text font-semibold'>Your answer</span>
-								</div>
+							</fieldset>
+							<fieldset className='fieldset'>
+								<label
+									className='label font-semibold'
+									htmlFor={`question-answer-${questionItem.id}`}>
+									Your answer
+								</label>
 								<textarea
+									id={`question-answer-${questionItem.id}`}
 									value={response}
 									onChange={(e) => setResponse(e.target.value)}
 									rows={isStarCategory(category) ? 8 : 5}
 									placeholder={
 										isStarCategory(category) ? STAR_ANSWER_TEMPLATE : undefined
 									}
-									className='textarea textarea-bordered w-full bg-base-300 font-mono text-sm'
+									className='textarea w-full bg-base-200 font-mono'
 								/>
-							</label>
+							</fieldset>
 							<div className='flex justify-end gap-2'>
 								<button
 									type='button'
-									className='btn btn-ghost btn-sm'
+									className='btn btn-ghost'
 									onClick={handleCancel}>
 									Cancel
 								</button>
 								<button
 									type='button'
-									className='btn btn-primary btn-sm'
+									className='btn btn-primary'
 									onClick={handleSave}>
 									Save
 								</button>
@@ -235,7 +229,8 @@ const QuestionCard = ({ questionItem }) => {
 				title='Delete question'>
 				<div className='pb-4'>
 					<p>
-						Are you sure you want to delete this question? This cannot be undone.
+						Are you sure you want to delete this question? This cannot be
+						undone.
 					</p>
 				</div>
 				<div className='flex justify-end'>

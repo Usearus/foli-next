@@ -117,98 +117,100 @@ const EditJobBtn = ({ job, label = 'Edit job' }) => {
 
 			<Modal isOpen={isModalOpen} onClose={handleCancelClick} title='Edit job'>
 				<form
-					className={`flex flex-col gap-2 ${validated ? 'was-validated' : ''}`}
+					className={`flex flex-col gap-4 ${validated ? 'was-validated' : ''}`}
 					onSubmit={handleSubmit}
 					noValidate>
-					<label className='form-control w-full'>
-						<div className='label'>
-							<span className='label-text'>
-								Company <span className='text-primary'>*</span>
-							</span>
-						</div>
+					<fieldset className='fieldset'>
+						<label className='label' htmlFor='edit-job-company'>
+							Company <span className='text-primary'>*</span>
+						</label>
 						<input
+							id='edit-job-company'
 							type='text'
 							required
-							className='input input-bordered w-full bg-base-300'
+							className='input w-full bg-base-200'
 							ref={companyRef}
 							defaultValue={initialValues.company}
 						/>
-					</label>
-					<label className='form-control w-full'>
-						<div className='label'>
-							<span className='label-text'>
-								Position <span className='text-primary'>*</span>
-							</span>
-						</div>
+					</fieldset>
+					<fieldset className='fieldset'>
+						<label className='label' htmlFor='edit-job-position'>
+							Position <span className='text-primary'>*</span>
+						</label>
 						<input
+							id='edit-job-position'
 							type='text'
 							required
-							className='input input-bordered w-full bg-base-300'
+							className='input w-full bg-base-200'
 							ref={positionRef}
 							defaultValue={initialValues.position}
 						/>
-					</label>
-					<div className='flex gap-6'>
-						<label className='form-control w-full'>
-							<div className='label'>
-								<span className='label-text'>Salary minimum ($)</span>
-							</div>
+					</fieldset>
+					<div className='flex gap-4'>
+						<fieldset className='fieldset w-full'>
+							<label className='label' htmlFor='edit-job-salary-min'>
+								Salary minimum ($)
+							</label>
 							<input
+								id='edit-job-salary-min'
 								type='number'
-								className='input input-bordered w-full bg-base-300'
+								className='input w-full bg-base-200'
 								placeholder='0'
 								ref={salaryMinRef}
 								defaultValue={initialValues.salary_min}
 								max='9999999'
 							/>
-						</label>
-						<label className='form-control w-full'>
-							<div className='label'>
-								<span className='label-text'>Salary maximum ($)</span>
-							</div>
+						</fieldset>
+						<fieldset className='fieldset w-full'>
+							<label className='label' htmlFor='edit-job-salary-max'>
+								Salary maximum ($)
+							</label>
 							<input
+								id='edit-job-salary-max'
 								type='number'
-								className='input input-bordered w-full bg-base-300'
+								className='input w-full bg-base-200'
 								placeholder='0'
 								ref={salaryMaxRef}
 								defaultValue={initialValues.salary_max}
 								max='9999999'
 							/>
-						</label>
+						</fieldset>
 					</div>
-					<label className='form-control w-full'>
-						<div className='label'>
-							<span className='label-text'>Location</span>
-						</div>
+					<fieldset className='fieldset'>
+						<label className='label' htmlFor='edit-job-location'>
+							Location
+						</label>
 						<input
+							id='edit-job-location'
 							type='text'
-							className='input input-bordered w-full bg-base-300'
+							className='input w-full bg-base-200'
 							ref={locationRef}
 							defaultValue={initialValues.location}
 						/>
-					</label>
-					<label className='form-control w-full'>
-						<div className='label'>
-							<span className='label-text'>Remote / hybrid</span>
-						</div>
+					</fieldset>
+					<fieldset className='fieldset'>
+						<label className='label cursor-pointer justify-start gap-3'>
+							<input
+								type='checkbox'
+								className='checkbox bg-base-200'
+								ref={remoteRef}
+								defaultChecked={initialValues.remote}
+							/>
+							Remote / hybrid
+						</label>
+					</fieldset>
+					<fieldset className='fieldset'>
+						<label className='label' htmlFor='edit-job-link'>
+							Listing URL
+						</label>
 						<input
-							type='checkbox'
-							className='checkbox bg-base-300'
-							ref={remoteRef}
-							defaultChecked={initialValues.remote}
-						/>
-					</label>
-					<label className='form-control w-full'>
-						<div className='label'>
-							<span className='label-text'>Listing URL</span>
-						</div>
-						<input
+							id='edit-job-link'
 							type='text'
-							className='input input-bordered w-full bg-base-300'
+							className='input w-full bg-base-200'
 							ref={linkRef}
 							defaultValue={initialValues.link}
 						/>
-					</label>
+					</fieldset>
 					<div className='flex justify-end pt-6'>
 						<button type='submit' className='btn btn-primary'>
 							Confirm

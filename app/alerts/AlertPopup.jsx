@@ -10,7 +10,7 @@ const AlertPopup = () => {
 		switch (type) {
 			case 'info':
 				return (
-					<div role='alert' className='alert border border-info bg-base-300'>
+					<div role='alert' className='alert border border-info bg-base-100'>
 						<svg
 							xmlns='http://www.w3.org/2000/svg'
 							fill='none'
@@ -30,7 +30,7 @@ const AlertPopup = () => {
 				);
 			case 'success':
 				return (
-					<div role='alert' className='alert border border-success bg-base-300'>
+					<div role='alert' className='alert border border-success bg-base-100'>
 						<svg
 							xmlns='http://www.w3.org/2000/svg'
 							className='h-6 w-6 shrink-0 stroke-current'
@@ -49,7 +49,7 @@ const AlertPopup = () => {
 				);
 			case 'warning':
 				return (
-					<div role='alert' className='alert border border-warning bg-base-300'>
+					<div role='alert' className='alert border border-warning bg-base-100'>
 						<svg
 							xmlns='http://www.w3.org/2000/svg'
 							className='h-6 w-6 shrink-0 stroke-current'
@@ -68,7 +68,7 @@ const AlertPopup = () => {
 				);
 			case 'error':
 				return (
-					<div role='alert' className='alert border border-error bg-base-300'>
+					<div role='alert' className='alert border border-error bg-base-100'>
 						<svg
 							xmlns='http://www.w3.org/2000/svg'
 							className='h-6 w-6 shrink-0 stroke-current'

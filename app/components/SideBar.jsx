@@ -47,7 +47,7 @@ const SideBar = () => {
 
 	return (
 		<>
-			<label className='pl-4 pb-2 font-bold'>Pages</label>
+			{/* <label className='pl-4 pb-2 text-lg font-bold'>Pages</label> */}
 
 			<div className='scroll-container'>
 				<DragDropContext

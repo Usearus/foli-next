@@ -38,7 +38,7 @@ function buildTemplateCategoryList(templates, onSelect, showCustomBadge = false)
 									type='button'
 									key={template.id}
 									onClick={() => onSelect(template)}
-									className='card card-compact bg-base-100 w-full shadow-md rounded-lg text-left'>
+									className='card card-sm bg-base-100 w-full shadow-md rounded-lg text-left'>
 									<div className='card-body'>
 										<h2 className='card-title text-base'>
 											{template.title}
@@ -149,7 +149,7 @@ const TemplateSidePanel = ({ isOpen, onClose }) => {
 	return (
 		<SidePanel isOpen={isOpen} onClose={handleClose} title='Templates'>
 			{!previewTemplate ? (
-				<div role='tablist' className='tabs tabs-bordered'>
+				<div role='tablist' className='tabs tabs-border'>
 					<input
 						type='radio'
 						name='templates'
@@ -214,7 +214,7 @@ const TemplateSidePanel = ({ isOpen, onClose }) => {
 				<div className='h-full flex flex-col gap-4 items-start'>
 					<button
 						type='button'
-						className='btn btn-sm btn-ghost text-primary hover:bg-base-200'
+						className='btn btn-ghost text-primary hover:bg-base-200'
 						onClick={handleCloseActiveTemplate}>
 						<ArrowLeftIcon /> Back to templates
 					</button>
@@ -231,7 +231,7 @@ const TemplateSidePanel = ({ isOpen, onClose }) => {
 						<div className='flex gap-2 justify-end mt-4'>
 							<button
 								type='button'
-								className='btn btn-sm btn-primary'
+								className='btn btn-primary'
 								onClick={handleAddPageClick}>
 								Add page
 							</button>

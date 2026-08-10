@@ -3,12 +3,14 @@
 import { useState, useContext, useRef, useEffect } from 'react';
 import { DatabaseContext } from '../context/DatabaseContext';
 import useAlert from '../alerts/useAlert';
+import { PlusIcon } from '@radix-ui/react-icons';
 import Modal from './Modal';
 import { supabase } from '../api/supabase';
 import {
-	INTERVIEWER_CATEGORIES,
+	PRACTICE_CATEGORIES,
+	QUESTION_TYPE_PRACTICE,
 	STAR_ANSWER_TEMPLATE,
-} from '../lib/interviewerQuestions';
+} from '../lib/questions';
 
 const AddQuestionBtn = () => {
 	const { fetchUserQuestions } = useContext(DatabaseContext);
@@ -51,6 +53,7 @@ const AddQuestionBtn = () => {
 		}
 
 		const { error } = await supabase.from('questions').insert({
+			type: QUESTION_TYPE_PRACTICE,
 			category,
 			question,
 			response,
@@ -89,52 +92,51 @@ const AddQuestionBtn = () => {
 				onClose={() => setIsModalOpen(false)}
 				title='Add question they may ask you'>
 				<form className='flex flex-col gap-4 pb-4' onSubmit={handleSubmit}>
-					<label className='form-control w-full'>
-						<div className='label'>
-							<span className='label-text'>Type</span>
-						</div>
+					<fieldset className='fieldset'>
+						<label className='label' htmlFor='add-question-type'>
+							Type
+						</label>
 						<select
+							id='add-question-type'
 							value={category}
 							onChange={handleCategoryChange}
-							className='select select-bordered w-full bg-base-300'>
-							{INTERVIEWER_CATEGORIES.map((option) => (
+							className='select w-full bg-base-200'>
+							{PRACTICE_CATEGORIES.map((option) => (
 								<option key={option} value={option}>
 									{option}
 								</option>
 							))}
 						</select>
-					</label>
-					<label className='form-control w-full'>
-						<div className='label'>
-							<span className='label-text'>
-								Question <span className='text-primary'>*</span>
-							</span>
-						</div>
+					</fieldset>
+					<fieldset className='fieldset'>
+						<label className='label' htmlFor='add-question-text'>
+							Question <span className='text-primary'>*</span>
+						</label>
 						<textarea
+							id='add-question-text'
 							required
 							ref={questionRef}
 							rows={3}
 							placeholder='e.g. Tell me about a time when...'
-							className='textarea textarea-bordered w-full bg-base-300'
+							className='textarea w-full bg-base-200'
 						/>
-					</label>
-					<label className='form-control w-full'>
-						<div className='label'>
-							<span className='label-text'>Your answer</span>
-						</div>
+					</fieldset>
+					<fieldset className='fieldset'>
+						<label className='label' htmlFor='add-question-answer'>
+							Your answer
+						</label>
 						<textarea
+							id='add-question-answer'
 							ref={answerRef}
 							defaultValue={STAR_ANSWER_TEMPLATE}
 							rows={8}
 							placeholder='Your prepared answer (optional)'
-							className='textarea textarea-bordered w-full bg-base-300 font-mono text-sm'
+							className='textarea w-full bg-base-200 font-mono'
 						/>
 						{category === 'Behavioral (STAR)' ? (
-							<p className='label-text-alt pt-1'>
-								Use STAR: Situation, Task, Action, Result
-							</p>
+							<p className='label'>Use STAR: Situation, Task, Action, Result</p>
 						) : null}
-					</label>
+					</fieldset>
 					<div className='flex justify-end pt-2'>
 						<button type='submit' className='btn btn-primary'>
 							Add question
@@ -144,11 +146,12 @@ const AddQuestionBtn = () => {
 			</Modal>
 			<button
 				type='button'
-				className='btn btn-primary btn-sm'
+				className='btn btn-primary rounded-full'
 				onClick={() => {
 					resetForm();
 					setIsModalOpen(true);
 				}}>
+				<PlusIcon className='size-4 shrink-0' />
 				Add question
 			</button>
 		</>

@@ -5,11 +5,12 @@ import { useRouter } from 'next/navigation';
 import { DatabaseContext } from '../context/DatabaseContext';
 import {
 	DotsVerticalIcon,
-	ChevronDownIcon,
 	ArrowUpIcon,
 	ArrowDownIcon,
 } from '@radix-ui/react-icons';
 import EditJobBtn from './EditJobBtn';
+import DeleteJobBtn from './DeleteJobBtn';
+import JobStatusDropdown from './JobStatusDropdown';
 
 const JobsTableRow = (job) => {
 	const { fetchCurrentJob, fetchCurrentPages, userProfile } =
@@ -29,8 +30,8 @@ const JobsTableRow = (job) => {
 			? Math.round(
 					((job.salary_max - userProfile.salary_current) /
 						userProfile.salary_target) *
-						100
-			  )
+						100,
+				)
 			: undefined;
 
 	const salaryIncreaseClassName =
@@ -73,8 +74,8 @@ const JobsTableRow = (job) => {
 		if (job.salary_min && job.salary_max) {
 			return (
 				<div className='flex flex-wrap items-center gap-2'>
-					${job.salary_min.toLocaleString()} - ${job.salary_max.toLocaleString()}{' '}
-					{salaryBadge}
+					${job.salary_min.toLocaleString()} - $
+					{job.salary_max.toLocaleString()} {salaryBadge}
 				</div>
 			);
 		}
@@ -99,7 +100,9 @@ const JobsTableRow = (job) => {
 	})();
 
 	return (
-		<tr key={job.id} className='hover:bg-base-100'>
+		<tr
+			key={job.id}
+			className='transition-colors duration-200 ease-out hover:bg-base-content/5'>
 			<td
 				onClick={handleTableRowClick}
 				className='min-w-[100px] max-w-[200px] cursor-pointer'>
@@ -116,61 +119,21 @@ const JobsTableRow = (job) => {
 			<td
 				onClick={handleTableRowClick}
 				className='hidden lg:table-cell cursor-pointer'>
+				{job.remote ? (
+					<div className='badge badge-secondary mr-2 my-1'>Remote / Hybrid</div>
+				) : null}
 				{job.location ? (
-					<div className='badge badge-neutral overflow-hidden mr-2 my-1'>
+					<div className='badge badge-secondary overflow-hidden mr-2 my-1'>
 						{job.location}
 					</div>
 				) : null}
-				{job.remote ? (
-					<div className='badge badge-neutral'>Remote / Hybrid</div>
-				) : null}
 			</td>
-			<td
-				onClick={handleTableRowClick}
-				className='hidden lg:table-cell font-light cursor-pointer'>
-				{new Date(job.edited).toLocaleDateString()}
-			</td>
-			<td>
-				<div className='dropdown dropdown-end'>
-					<div
-						tabIndex={0}
-						role='button'
-						className='btn btn-xs btn-outline flex justify-between min-w-32'>
-						{job.status} <ChevronDownIcon />
-					</div>
-					<ul
-						tabIndex={0}
-						className='dropdown-content menu bg-base-200 rounded-box z-[1] w-52 p-2 shadow'>
-						<li>
-							<a>Interested</a>
-						</li>
-						<li>
-							<a>Applied</a>
-						</li>
-						<li>
-							<a>Interviewing</a>
-						</li>
-						<li>
-							<a>Negotiating</a>
-						</li>
-						<li>
-							<a>Accepted</a>
-						</li>
-						<li>
-							<a>Declined</a>
-						</li>
-						<li>
-							<a>Rejected</a>
-						</li>
-						<li>
-							<a>Closed</a>
-						</li>
-					</ul>
-				</div>
+			<td className='overflow-visible'>
+				<JobStatusDropdown job={job} />
 			</td>
 			<td className='w-8'>
 				<div className='dropdown dropdown-end'>
-					<div tabIndex={0} role='button' className='btn btn-xs btn-ghost'>
+					<div tabIndex={0} role='button' className='btn btn-ghost'>
 						<DotsVerticalIcon />
 					</div>
 					<ul
@@ -179,8 +142,8 @@ const JobsTableRow = (job) => {
 						<li onClick={(event) => event.stopPropagation()}>
 							<EditJobBtn job={job} label='Edit' />
 						</li>
-						<li>
-							<a>Delete</a>
+						<li onClick={(event) => event.stopPropagation()}>
+							<DeleteJobBtn job={job} className='text-error' />
 						</li>
 					</ul>
 				</div>

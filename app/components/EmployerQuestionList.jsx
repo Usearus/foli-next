@@ -7,15 +7,16 @@ import useAlert from '../alerts/useAlert';
 import Modal from './Modal';
 import { supabase } from '../api/supabase';
 import EmployerQuestionFilter from './EmployerQuestionFilter';
+import QuestionSearchInput from './QuestionSearchInput';
 import {
-	isEmployerQuestion,
-	getEmployerQuestionType,
-	employerCategory,
-	EMPLOYER_QUESTION_TYPES,
-	EMPLOYER_QUESTION_FILTER_ALL,
-	filterEmployerQuestionsByType,
-	STARTER_EMPLOYER_QUESTIONS,
-} from '../lib/employerQuestions';
+	isMyQuestion,
+	getMyQuestionCategory,
+	filterMyQuestionsByCategory,
+	filterQuestionsBySearch,
+	MY_QUESTION_CATEGORIES,
+	MY_QUESTION_FILTER_ALL,
+	QUESTION_TYPE_MY_QUESTION,
+} from '../lib/questions';
 
 const EmployerQuestionRow = ({
 	questionItem,
@@ -27,11 +28,11 @@ const EmployerQuestionRow = ({
 	const { setAlert } = useAlert();
 	const [isEditOpen, setIsEditOpen] = useState(false);
 	const [isDeleteOpen, setIsDeleteOpen] = useState(false);
-	const [type, setType] = useState(getEmployerQuestionType(questionItem));
+	const [category, setCategory] = useState(getMyQuestionCategory(questionItem));
 	const [question, setQuestion] = useState(questionItem.question || '');
 
 	const openEdit = () => {
-		setType(getEmployerQuestionType(questionItem));
+		setCategory(getMyQuestionCategory(questionItem));
 		setQuestion(questionItem.question || '');
 		setIsEditOpen(true);
 	};
@@ -46,7 +47,8 @@ const EmployerQuestionRow = ({
 		const { error } = await supabase
 			.from('questions')
 			.update({
-				category: employerCategory(type),
+				type: QUESTION_TYPE_MY_QUESTION,
+				category,
 				question: trimmedQuestion,
 			})
 			.eq('id', questionItem.id);
@@ -80,39 +82,36 @@ const EmployerQuestionRow = ({
 		setIsDeleteOpen(false);
 	};
 
-	const typeLabel = getEmployerQuestionType(questionItem);
-
 	return (
 		<>
 			<div className='bg-base-100 rounded-xl p-4 flex items-start gap-3 shadow-sm'>
 				<input
 					type='checkbox'
-					className='checkbox checkbox-primary mt-1'
+					className='checkbox checkbox-secondary mt-1'
 					checked={isSelected}
 					onChange={() => onToggle(questionItem.id)}
 					aria-label={`Select question: ${questionItem.question}`}
 				/>
-				<div className='flex-grow min-w-0'>
-					<div className='flex justify-between gap-3 items-start'>
-						<span className='badge badge-neutral badge-sm mb-2'>{typeLabel}</span>
-						<div className='flex gap-1 shrink-0'>
-							<button
-								type='button'
-								className='btn btn-ghost btn-xs btn-square'
-								onClick={openEdit}
-								aria-label='Edit question'>
-								<Pencil1Icon />
-							</button>
-							<button
-								type='button'
-								className='btn btn-ghost btn-xs btn-square text-error'
-								onClick={() => setIsDeleteOpen(true)}
-								aria-label='Delete question'>
-								<TrashIcon />
-							</button>
-						</div>
+				<div className='flex-grow min-w-0 flex justify-between items-start gap-4'>
+					<h3 className='font-semibold text-base leading-snug'>
+						{questionItem.question}
+					</h3>
+					<div className='flex gap-1 shrink-0'>
+						<button
+							type='button'
+							className='btn btn-ghost btn-square'
+							onClick={openEdit}
+							aria-label='Edit question'>
+							<Pencil1Icon />
+						</button>
+						<button
+							type='button'
+							className='btn btn-ghost btn-square text-error'
+							onClick={() => setIsDeleteOpen(true)}
+							aria-label='Delete question'>
+							<TrashIcon />
+						</button>
 					</div>
-					<p className='text-sm leading-relaxed'>{questionItem.question}</p>
 				</div>
 			</div>
 
@@ -126,35 +125,35 @@ const EmployerQuestionRow = ({
 						event.preventDefault();
 						handleSave();
 					}}>
-					<label className='form-control w-full'>
-						<div className='label'>
-							<span className='label-text'>Type</span>
-						</div>
+					<fieldset className='fieldset'>
+						<label className='label' htmlFor='edit-employer-question-category'>
+							Category
+						</label>
 						<select
-							value={type}
-							onChange={(e) => setType(e.target.value)}
-							className='select select-bordered w-full bg-base-300'>
-							{EMPLOYER_QUESTION_TYPES.map((option) => (
+							id='edit-employer-question-category'
+							value={category}
+							onChange={(e) => setCategory(e.target.value)}
+							className='select w-full bg-base-200'>
+							{MY_QUESTION_CATEGORIES.map((option) => (
 								<option key={option} value={option}>
 									{option}
 								</option>
 							))}
 						</select>
-					</label>
-					<label className='form-control w-full'>
-						<div className='label'>
-							<span className='label-text'>
-								Question <span className='text-primary'>*</span>
-							</span>
-						</div>
+					</fieldset>
+					<fieldset className='fieldset'>
+						<label className='label' htmlFor='edit-employer-question-text'>
+							Question <span className='text-primary'>*</span>
+						</label>
 						<textarea
+							id='edit-employer-question-text'
 							required
 							value={question}
 							onChange={(e) => setQuestion(e.target.value)}
 							rows={3}
-							className='textarea textarea-bordered w-full bg-base-300'
+							className='textarea w-full bg-base-200'
 						/>
-					</label>
+					</fieldset>
 					<div className='flex justify-end pt-2'>
 						<button type='submit' className='btn btn-primary'>
 							Save
@@ -184,88 +183,87 @@ const EmployerQuestionRow = ({
 };
 
 const EmployerQuestionList = ({ selectedIds, onToggle, onSelectionChange }) => {
-	const { userQuestions, fetchUserQuestions } = useContext(DatabaseContext);
-	const { setAlert } = useAlert();
-	const [typeFilter, setTypeFilter] = useState(EMPLOYER_QUESTION_FILTER_ALL);
+	const { userQuestions } = useContext(DatabaseContext);
+	const [categoryFilter, setCategoryFilter] = useState(MY_QUESTION_FILTER_ALL);
+	const [searchQuery, setSearchQuery] = useState('');
 
-	const employerQuestions = useMemo(
-		() => (userQuestions || []).filter(isEmployerQuestion),
+	const myQuestions = useMemo(
+		() => (userQuestions || []).filter(isMyQuestion),
 		[userQuestions],
 	);
 
 	const filterCounts = useMemo(() => {
-		const counts = { [EMPLOYER_QUESTION_FILTER_ALL]: employerQuestions.length };
-		EMPLOYER_QUESTION_TYPES.forEach((type) => {
-			counts[type] = employerQuestions.filter(
-				(q) => getEmployerQuestionType(q) === type,
+		const counts = { [MY_QUESTION_FILTER_ALL]: myQuestions.length };
+		MY_QUESTION_CATEGORIES.forEach((category) => {
+			counts[category] = myQuestions.filter(
+				(q) => getMyQuestionCategory(q) === category,
 			).length;
 		});
 		return counts;
-	}, [employerQuestions]);
+	}, [myQuestions]);
 
-	const filteredQuestions = useMemo(
-		() => filterEmployerQuestionsByType(employerQuestions, typeFilter),
-		[employerQuestions, typeFilter],
-	);
+	const filteredQuestions = useMemo(() => {
+		const byCategory = filterMyQuestionsByCategory(myQuestions, categoryFilter);
+		return filterQuestionsBySearch(byCategory, searchQuery);
+	}, [myQuestions, categoryFilter, searchQuery]);
 
 	useEffect(() => {
-		const validIds = new Set(employerQuestions.map((q) => q.id));
+		const validIds = new Set(myQuestions.map((q) => q.id));
 		const cleaned = selectedIds.filter((id) => validIds.has(id));
 		if (cleaned.length !== selectedIds.length) {
 			onSelectionChange(cleaned);
 		}
-	}, [employerQuestions, selectedIds, onSelectionChange]);
-
-	const handleAddStarters = async () => {
-		const { error } = await supabase.from('questions').insert(STARTER_EMPLOYER_QUESTIONS);
-		if (error) {
-			setAlert('Unable to add starter questions', 'error');
-			console.log(error);
-			return;
-		}
-		fetchUserQuestions();
-		setAlert('Starter questions added', 'success');
-	};
+	}, [myQuestions, selectedIds, onSelectionChange]);
 
 	const handleDeleted = (id) => {
 		onSelectionChange(selectedIds.filter((selectedId) => selectedId !== id));
 	};
 
-	if (!employerQuestions.length) {
+	if (!myQuestions.length) {
 		return (
-			<div className='max-w-3xl mx-auto w-full p-8 flex flex-col items-center gap-6 text-center'>
+			<div className='max-w-3xl mx-auto w-full p-8 flex flex-col items-center gap-4 text-center'>
 				<div>
-					<h2 className='text-lg font-semibold'>Build your list for interviews</h2>
+					<h2 className='text-lg font-semibold'>
+						Build your list for interviews
+					</h2>
 					<p className='text-sm text-base-content/70 mt-2'>
-						Check the questions you want, then copy them as a formatted list to paste
-						into a job page sheet.
+						Add questions with the button above, then copy selected ones into a
+						job page sheet.
 					</p>
 				</div>
-				<button
-					type='button'
-					className='btn btn-primary btn-sm'
-					onClick={handleAddStarters}>
-					Add starter questions
-				</button>
 			</div>
 		);
 	}
 
 	return (
-		<>
-			<EmployerQuestionFilter
-				activeFilter={typeFilter}
-				onFilterChange={setTypeFilter}
-				counts={filterCounts}
-			/>
+		<div className='max-w-3xl mx-auto w-full px-4 pt-4 flex flex-col gap-3'>
+			<div className='flex items-center justify-between gap-3'>
+				<EmployerQuestionFilter
+					activeFilter={categoryFilter}
+					onFilterChange={setCategoryFilter}
+					counts={filterCounts}
+				/>
+				<QuestionSearchInput
+					value={searchQuery}
+					onChange={setSearchQuery}
+					placeholder='Search questions'
+					className='!w-[250px] shrink-0'
+				/>
+			</div>
 			{filteredQuestions.length === 0 ? (
-				<div className='max-w-3xl mx-auto w-full p-8 text-center'>
+				<div className='py-8 text-center'>
 					<p className='text-sm text-base-content/70'>
-						No questions for <span className='font-semibold'>{typeFilter}</span>.
+						{searchQuery.trim()
+							? `No questions match "${searchQuery.trim()}"${
+									categoryFilter !== MY_QUESTION_FILTER_ALL
+										? ` in ${categoryFilter}`
+										: ''
+								}.`
+							: `No questions for ${categoryFilter}.`}
 					</p>
 				</div>
 			) : (
-				<div className='max-w-3xl mx-auto w-full p-4 flex flex-col gap-3'>
+				<div className='flex flex-col gap-3 pb-4'>
 					{filteredQuestions.map((questionItem) => (
 						<EmployerQuestionRow
 							key={questionItem.id}
@@ -277,7 +275,7 @@ const EmployerQuestionList = ({ selectedIds, onToggle, onSelectionChange }) => {
 					))}
 				</div>
 			)}
-		</>
+		</div>
 	);
 };
 

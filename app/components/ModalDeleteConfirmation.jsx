@@ -5,7 +5,7 @@ import { supabase } from '../api/supabase';
 
 const ModalDeleteConfirmation = ({ show, close, type, object }) => {
 	const { setAlert } = useAlert();
-	const { fetchUserJobs, fetchCurrentPages, currentJob, fetchUserSnippets } =
+	const { fetchUserJobs, fetchCurrentPages, currentJob } =
 		useContext(DatabaseContext);
 
 	const handleDelete = async (e) => {
@@ -35,26 +35,13 @@ const ModalDeleteConfirmation = ({ show, close, type, object }) => {
 			setAlert('Page deleted', 'success');
 			fetchCurrentPages(currentJob);
 		}
-		if (type === 'snippet') {
-			const { error } = await supabase
-				.from('snippets')
-				.delete()
-				.eq('id', object.id);
-			if (error) {
-				console.error(error);
-				setAlert('Unable to delete snippet.', 'Danger');
-				return;
-			}
-			setAlert('Snippet deleted', 'success');
-			fetchUserSnippets();
-		}
 	};
 	return (
 		<>
 			<dialog className='modal'>
 				<div className='modal-box'>
 					<form method='dialog'>
-						<button className='btn btn-sm btn-circle btn-ghost absolute right-2 top-2'>
+						<button className='btn btn-circle btn-ghost absolute right-2 top-2'>
 							✕
 						</button>
 					</form>
@@ -62,7 +49,7 @@ const ModalDeleteConfirmation = ({ show, close, type, object }) => {
 					<p className='py-4'>Are you sure you want to delete this page?</p>
 					<button
 						type='button'
-						className='btn btn-sm btn-primary-outline w-fit'
+						className='btn btn-primary-outline w-fit'
 						onClick={handleDelete}>
 						Confirm
 					</button>
@@ -73,7 +60,7 @@ const ModalDeleteConfirmation = ({ show, close, type, object }) => {
 				<p className='py-4'>Are you sure you want to delete this item?</p>
 				<button
 					type='button'
-					className='btn btn-sm btn-primary-outline w-fit'
+					className='btn btn-primary-outline w-fit'
 					onClick={handleDelete}>
 					Confirm
 				</button>

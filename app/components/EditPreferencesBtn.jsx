@@ -101,7 +101,7 @@ const EditPreferencesBtn = () => {
 		<>
 			<button
 				type='button'
-				className='btn btn-ghost btn-sm'
+				className='btn btn-ghost'
 				onClick={() => setIsModalOpen(true)}>
 				<Pencil1Icon />
 			</button>
@@ -114,56 +114,60 @@ const EditPreferencesBtn = () => {
 					className={`flex flex-col gap-6 ${validated ? 'was-validated' : ''}`}
 					onSubmit={handleSubmit}
 					noValidate>
-					<label className='form-control w-full'>
-						<div className='label'>
-							<span className='label-text'>Position title</span>
-						</div>
+					<fieldset className='fieldset'>
+						<label className='label' htmlFor='edit-preferences-position'>
+							Position title
+						</label>
 						<input
+							id='edit-preferences-position'
 							type='text'
-							className='input input-bordered w-full bg-base-300'
+							className='input w-full bg-base-200'
 							ref={positionRef}
 							defaultValue={initialValues.position}
 						/>
-					</label>
+					</fieldset>
 
 					<div className='flex gap-4'>
-						<label className='form-control w-full'>
-							<div className='label'>
-								<span className='label-text'>Current salary ($)</span>
-							</div>
+						<fieldset className='fieldset w-full'>
+							<label className='label' htmlFor='edit-preferences-salary-current'>
+								Current salary ($)
+							</label>
 							<input
+								id='edit-preferences-salary-current'
 								type='number'
-								className='input input-bordered w-full bg-base-300'
+								className='input w-full bg-base-200'
 								placeholder='0'
 								ref={salaryCurrentRef}
 								defaultValue={initialValues.salary_current}
 								max='9999999'
 							/>
-						</label>
-						<label className='form-control w-full'>
-							<div className='label'>
-								<span className='label-text'>Target salary ($)</span>
-							</div>
+						</fieldset>
+						<fieldset className='fieldset w-full'>
+							<label className='label' htmlFor='edit-preferences-salary-target'>
+								Target salary ($)
+							</label>
 							<input
+								id='edit-preferences-salary-target'
 								type='number'
-								className='input input-bordered w-full bg-base-300'
+								className='input w-full bg-base-200'
 								placeholder='0'
 								ref={salaryTargetRef}
 								defaultValue={initialValues.salary_target}
 								max='9999999'
 							/>
-						</label>
+						</fieldset>
 					</div>
 
 					<div className='flex flex-col gap-2'>
-						<label className='form-control w-full'>
-							<div className='label'>
-								<span className='label-text'>Location</span>
-							</div>
+						<fieldset className='fieldset'>
+							<label className='label' htmlFor='edit-preferences-location'>
+								Location
+							</label>
 							<div className='flex gap-2'>
 								<input
+									id='edit-preferences-location'
 									type='text'
-									className='input input-bordered w-full bg-base-300'
+									className='input w-full bg-base-200'
 									placeholder='ex: New York City, NY'
 									value={locationInput}
 									onChange={(e) => setLocationInput(e.target.value)}
@@ -195,19 +199,19 @@ const EditPreferencesBtn = () => {
 									</div>
 								))}
 							</div>
-						</label>
+						</fieldset>
 
-						<label className='form-control w-full'>
-							<div className='label'>
-								<span className='label-text'>Remote / hybrid</span>
-							</div>
-							<input
-								type='checkbox'
-								className='checkbox bg-base-300'
-								ref={remoteRef}
-								defaultChecked={initialValues.location_remote}
-							/>
-						</label>
+						<fieldset className='fieldset'>
+							<label className='label cursor-pointer justify-start gap-3'>
+								<input
+									type='checkbox'
+									className='checkbox bg-base-200'
+									ref={remoteRef}
+									defaultChecked={initialValues.location_remote}
+								/>
+								Remote / hybrid
+							</label>
+						</fieldset>
 					</div>
 
 					<div className='flex justify-end pt-6'>

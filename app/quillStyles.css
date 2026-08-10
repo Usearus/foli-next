@@ -2,23 +2,23 @@
 
 /* Define global CSS variables for light theme */
 :root {
-    --quill-border-color: #e5e7eb;
+    --quill-border-color: var(--color-base-300);
     --quill-border-radius: 0.5rem;
     --quill-toolbar-border-radius: 9999px;
     --quill-box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 
-    --quill-background-color: #ffffff;
-    --quill-text-color: #1f2937;
-    --quill-link-color: #2563eb;
-    --quill-placeholder-color: #9ca3af;
+    --quill-background-color: transparent;
+    --quill-text-color: var(--color-base-content);
+    --quill-link-color: var(--color-primary);
+    --quill-placeholder-color: color-mix(in srgb, var(--color-base-content) 50%, transparent);
 
-    --quill-toolbar-background: #ffffff;
-    --quill-toolbar-border-color: #e5e7eb;
-    --quill-toolbar-button-color: #4b5563;
-    --quill-toolbar-button-hover-color: #2563eb;
-    --quill-toolbar-button-active-color: #1d4ed8;
+    --quill-toolbar-background: var(--color-base-100);
+    --quill-toolbar-border-color: var(--color-base-300);
+    --quill-toolbar-button-color: var(--color-base-content);
+    --quill-toolbar-button-hover-color: var(--color-primary);
+    --quill-toolbar-button-active-color: var(--color-primary);
 
-    --quill-neutral-content: #a4a4ac;
+    --quill-neutral-content: color-mix(in srgb, var(--color-base-content) 60%, transparent);
 
     --quill-edit-enter-duration: 400ms;
     --quill-toolbar-slot-height: calc(0.5rem + 4.5rem);
@@ -26,21 +26,21 @@
 
 /* Define CSS variables for dark theme */
 [data-theme='dark'] {
-    --quill-border-color: #374151;
+    --quill-border-color: var(--color-base-300);
     --quill-box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 
-    --quill-background-color: #1d232a;
-    --quill-text-color: #e5e7eb;
-    --quill-link-color: #3b82f6;
-    --quill-placeholder-color: #6b7280;
+    --quill-background-color: transparent;
+    --quill-text-color: var(--color-base-content);
+    --quill-link-color: var(--color-primary);
+    --quill-placeholder-color: color-mix(in srgb, var(--color-base-content) 45%, transparent);
 
-    --quill-toolbar-background: #2d3748;
-    --quill-toolbar-border-color: #4a5568;
-    --quill-toolbar-button-color: #e5e7eb;
-    --quill-toolbar-button-hover-color: #60a5fa;
-    --quill-toolbar-button-active-color: #2563eb;
+    --quill-toolbar-background: var(--color-base-200);
+    --quill-toolbar-border-color: var(--color-base-300);
+    --quill-toolbar-button-color: var(--color-base-content);
+    --quill-toolbar-button-hover-color: var(--color-primary);
+    --quill-toolbar-button-active-color: var(--color-primary);
 
-    --quill-neutral-content: #a6adbb;
+    --quill-neutral-content: color-mix(in srgb, var(--color-base-content) 60%, transparent);
 }
 
 @keyframes quill-toolbar-fade-in-down {
@@ -364,6 +364,11 @@
     border: 0 !important;
     font-family: inherit !important;
     font-size: 16px !important;
+    background: transparent !important;
+}
+
+.page-sheet-container .ql-container.ql-snow {
+    color: inherit;
 }
 
 .quill-editor-enter .ql-container.ql-snow {
@@ -401,71 +406,46 @@
     animation: page-sheet-view-enter var(--quill-edit-enter-duration) ease-in forwards;
 }
 
-.page-sheet-editing .page-sheet-editor {
-    grid-area: 1 / 1;
-    z-index: 1;
-    width: 100%;
-    min-width: 0;
+.page-sheet-container .quill-editor-enter .ql-toolbar.ql-snow,
+.page-sheet-container .quill-editor-enter .ql-snow.ql-toolbar {
+    overflow: hidden;
+    animation:
+        quill-toolbar-fade-in-down var(--quill-edit-enter-duration) ease-out forwards,
+        quill-toolbar-overflow-visible 0ms ease var(--quill-edit-enter-duration) forwards;
 }
 
-.ql-editor {
-    line-height: 1.5 !important;
+.page-sheet-container .quill-editor-exiting .ql-toolbar.ql-snow,
+.page-sheet-container .quill-editor-exiting .ql-snow.ql-toolbar {
+    overflow: hidden;
+    transition: none;
+    animation: quill-toolbar-fade-out-up var(--quill-edit-enter-duration) ease-in forwards;
 }
 
-.page-sheet-editor .ql-editor {
-    padding: 1rem !important;
+.page-sheet-container .page-sheet-view-mode .ql-toolbar.ql-snow,
+.page-sheet-container .page-sheet-view-mode .ql-snow.ql-toolbar {
+  overflow: hidden;
+  opacity: 0;
+  max-height: 0;
+  margin-top: 0;
+  margin-bottom: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  transform: translateY(-0.75rem);
+  border-width: 0;
+  box-shadow: none;
+  pointer-events: none;
+}
+
+.page-sheet-container .page-sheet-view-mode .ql-container.ql-snow {
+  border: 0 !important;
 }
 
 /* Placeholder text */
 .ql-editor.ql-blank::before {
     color: var(--quill-neutral-content) !important;
     font-style: normal !important;
-    left: 1rem !important;
-    right: 1rem !important;
-}
-
-/* Match markdown list styling in the editor */
-.ql-editor ol > li,
-.ql-editor ul > li {
-    list-style-type: none;
-}
-
-.ql-editor ul > li::before {
-    content: none !important;
-    display: none !important;
-}
-
-.ql-editor ol li:not(.ql-direction-rtl),
-.ql-editor ul li:not(.ql-direction-rtl) {
-    padding-left: 0 !important;
-    padding-bottom: 0.5rem !important;
-}
-
-.ql-editor ul li:not(.ql-direction-rtl) {
-    list-style-type: circle !important;
-    list-style-position: outside !important;
-}
-
-.ql-editor ol li:not(.ql-direction-rtl) {
-    list-style-type: none !important;
-}
-
-.ql-editor ol li:not(.ql-direction-rtl)::before {
-    display: inline-block;
-    white-space: nowrap;
-    width: 1.2em;
-    margin-left: -1.5em;
-    margin-right: 0.3em;
-    text-align: right;
-}
-
-/* Editor content colors */
-.ql-editor * {
-    color: var(--quill-text-color) !important;
-}
-
-.ql-editor a {
-    color: var(--quill-link-color) !important;
+    left: 1.75rem !important;
+    right: 1.75rem !important;
 }
 
 /* Custom size picker labels */

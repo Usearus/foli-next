@@ -49,8 +49,8 @@ const Settings = () => {
 			? Math.round(
 					((userProfile.salary_target - userProfile.salary_current) /
 						userProfile.salary_current) *
-						100
-			  )
+						100,
+				)
 			: undefined;
 
 	const salaryIncreaseClassName =
@@ -112,7 +112,9 @@ const Settings = () => {
 						<span className='font-bold'>General</span>
 						<ul>
 							<li>
-								<button type='button' onClick={() => scrollToSection(profileRef)}>
+								<button
+									type='button'
+									onClick={() => scrollToSection(profileRef)}>
 									Profile
 								</button>
 							</li>
@@ -165,46 +167,36 @@ const Settings = () => {
 				ref={contentRef}
 				className='flex flex-1 min-h-0 justify-center w-full overflow-y-auto'>
 				<div className='max-w-[700px] w-full p-4 flex flex-col gap-4'>
-					<div ref={profileRef} className='bg-base-100 rounded-box p-8 flex flex-col gap-6'>
+					<div
+						ref={profileRef}
+						className='bg-base-100 rounded-box p-8 flex flex-col gap-6'>
 						<div>
 							<h2 className='text-xl font-bold'>Profile</h2>
 						</div>
 						{userProfile ? (
 							<div className='flex flex-col gap-4'>
-								<label className='form-control w-full'>
-									<div className='label font-bold'>
-										<span className='label-text'>Picture</span>
-									</div>
-									<div className='avatar placeholder'>
-										<div className='bg-neutral text-neutral-content w-16 rounded-full'>
+								<div className='flex items-center gap-4'>
+									<div className='avatar avatar-placeholder shrink-0'>
+										<div className='bg-base-200 text-base-content w-16 rounded-full'>
 											<span className='text-xl'>
 												{userProfile.email?.[0]?.toUpperCase() ?? 'A'}
 											</span>
 										</div>
 									</div>
-								</label>
-								<div className='divider m-0'></div>
-								<div className='flex gap-4'>
-									<label className='form-control w-full'>
-										<div className='label font-bold'>
-											<span className='label-text'>Name</span>
-										</div>
-										<div className='px-1'>{firstName}</div>
-									</label>
-									<label className='form-control w-full'>
-										<div className='label font-bold'>
-											<span className='label-text'>Email</span>
-										</div>
-										<div className='px-1'>{userProfile.email}</div>
-									</label>
+									<div className='flex flex-col min-w-0'>
+										<span>{firstName}</span>
+										<span className='text-sm opacity-60 truncate'>
+											{userProfile.email}
+										</span>
+									</div>
 								</div>
 								<div className='divider m-0'></div>
-								<label className='w-full flex justify-between'>
-									<div className='label font-bold'>
-										<span className='label-text'>Interface theme</span>
+								<fieldset className='fieldset'>
+									<div className='flex justify-between items-center w-full'>
+										<label className='label font-bold'>Interface theme</label>
+										<ThemeToggle />
 									</div>
-									<ThemeToggle />
-								</label>
+								</fieldset>
 							</div>
 						) : null}
 					</div>
@@ -218,55 +210,45 @@ const Settings = () => {
 								<EditPreferencesBtn />
 							</div>
 							<div className='flex flex-col gap-4'>
-								<label className='form-control w-full'>
-									<div className='label font-bold'>
-										<span className='label-text'>Target position</span>
-									</div>
-									<div className='px-1'>
+								<fieldset className='fieldset'>
+									<label className='label font-bold'>Target position</label>
+									<p className='px-1'>
 										{userProfile.position ? userProfile.position : '-'}
-									</div>
-								</label>
+									</p>
+								</fieldset>
 								<div className='divider m-0'></div>
 								<div className='flex gap-4'>
-									<label className='form-control w-full'>
-										<div className='label font-bold'>
-											<span className='label-text'>Current Salary</span>
-										</div>
-										<div className='px-1'>
+									<fieldset className='fieldset w-full'>
+										<label className='label font-bold'>Current Salary</label>
+										<p className='px-1'>
 											{userProfile.salary_current !== undefined &&
 											userProfile.salary_current !== null
 												? `$${userProfile.salary_current.toLocaleString()}`
 												: '-'}
-										</div>
-									</label>
-									<label className='form-control w-full'>
-										<div className='label font-bold'>
-											<span className='label-text'>Target salary</span>
-										</div>
-										<div className='px-1'>{targetSalaryDisplay}</div>
-									</label>
+										</p>
+									</fieldset>
+									<fieldset className='fieldset w-full'>
+										<label className='label font-bold'>Target salary</label>
+										<p className='px-1'>{targetSalaryDisplay}</p>
+									</fieldset>
 								</div>
 								<div className='divider m-0'></div>
-								<label className='form-control w-full'>
-									<div className='label font-bold'>
-										<span className='label-text'>Locations</span>
-									</div>
+								<fieldset className='fieldset'>
+									<label className='label font-bold'>Locations</label>
 									<div className='flex gap-2 flex-wrap'>
 										{Array.isArray(userProfile.location_preference) &&
 											userProfile.location_preference.map((location) => (
-												<div
-													key={location}
-													className='badge badge-neutral mt-2'>
+												<div key={location} className='badge bg-base-200 mt-2'>
 													{location}
 												</div>
 											))}
 										{userProfile.location_remote ? (
-											<div className='badge badge-neutral mt-2'>
+											<div className='badge bg-base-200 mt-2'>
 												Remote / Hybrid
 											</div>
 										) : null}
 									</div>
-								</label>
+								</fieldset>
 							</div>
 						</div>
 					) : null}

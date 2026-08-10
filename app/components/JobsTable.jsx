@@ -1,37 +1,113 @@
 'use client';
 
-import { InfoCircledIcon } from '@radix-ui/react-icons';
+import { InfoCircledIcon, ArrowUpIcon, ArrowDownIcon } from '@radix-ui/react-icons';
 import JobsTableRow from './JobsTableRow';
 
-const JobsTable = ({ jobs }) => {
+const SortableHeader = ({
+	column,
+	label,
+	labelContent,
+	sortColumn,
+	sortDirection,
+	onSort,
+	className = '',
+	children,
+	renderSortIndicator,
+}) => {
+	const isActive = sortColumn === column && sortDirection;
+	const sortIndicator = isActive
+		? renderSortIndicator?.(sortDirection) ?? (
+				<>
+					{sortDirection === 'asc' ? (
+						<ArrowUpIcon className='shrink-0' />
+					) : null}
+					{sortDirection === 'desc' ? (
+						<ArrowDownIcon className='shrink-0' />
+					) : null}
+				</>
+			)
+		: null;
+
 	return (
-		<table className='table text-base-content'>
-			<thead>
+		<th className={`group relative p-0 ${className}`}>
+			<button
+				type='button'
+				className='absolute inset-0 z-0 cursor-pointer group-hover:bg-base-content/5'
+				onClick={() => onSort(column)}
+				aria-label={
+					isActive
+						? renderSortIndicator
+							? `Sort by ${label}, currently ${sortDirection === 'asc' ? 'remote first' : 'city first'}`
+							: `Sort by ${label}, currently ${sortDirection === 'asc' ? 'ascending' : 'descending'}`
+						: `Sort by ${label}`
+				}
+			/>
+			<div className='relative z-10 flex items-center gap-1 px-4 py-3 font-semibold pointer-events-none group-hover:text-primary transition-colors'>
+				<span>{labelContent ?? label}</span>
+				{sortIndicator}
+				{children}
+			</div>
+		</th>
+	);
+};
+
+const JobsTable = ({ jobs, sortColumn, sortDirection, onSort }) => {
+	return (
+		<table className='table table-md w-full rounded-none text-base-content'>
+			<thead className='text-base'>
 				<tr>
-					<th className='min-w-[100px] max-w-[200px]'>Job</th>
-					<th className='hidden lg:table-cell'>
-						<div className='flex items-center gap-1'>
-							Salary
-							<div
-								className='tooltip font-normal'
-								data-tip='Compared to your current salary'>
-								<InfoCircledIcon />
-							</div>
+					<SortableHeader
+						column='job'
+						label='Job'
+						sortColumn={sortColumn}
+						sortDirection={sortDirection}
+						onSort={onSort}
+						className='min-w-[100px] max-w-[200px]'
+					/>
+					<SortableHeader
+						column='salary'
+						label='Salary'
+						sortColumn={sortColumn}
+						sortDirection={sortDirection}
+						onSort={onSort}
+						className='hidden lg:table-cell'>
+						<div
+							className='tooltip pointer-events-auto font-normal'
+							data-tip='Sorting is based on max salary'
+							onClick={(event) => event.stopPropagation()}
+							onKeyDown={(event) => event.stopPropagation()}>
+							<InfoCircledIcon />
 						</div>
-					</th>
-						<th className='hidden lg:table-cell'>Location</th>
-						<th className='hidden lg:table-cell'>Edited</th>
-						<th>Status</th>
-						<th></th>
-					</tr>
-				</thead>
-				{/* Body */}
-				<tbody>
-					{jobs.map((job) => (
-						<JobsTableRow key={job.id} {...job} id={job.id} />
-					))}
-				</tbody>
-			</table>
+					</SortableHeader>
+					<SortableHeader
+						column='location'
+						label='Location'
+						sortColumn={sortColumn}
+						sortDirection={sortDirection}
+						onSort={onSort}
+						className='hidden lg:table-cell'
+						renderSortIndicator={(direction) => (
+							<span className='shrink-0'>
+								{direction === 'asc' ? '(Remote first)' : '(City first)'}
+							</span>
+						)}
+					/>
+					<SortableHeader
+						column='status'
+						label='Status'
+						sortColumn={sortColumn}
+						sortDirection={sortDirection}
+						onSort={onSort}
+					/>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody>
+				{jobs.map((job) => (
+					<JobsTableRow key={job.id} {...job} id={job.id} />
+				))}
+			</tbody>
+		</table>
 	);
 };
 
