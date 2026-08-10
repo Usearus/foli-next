@@ -3,6 +3,7 @@
 import { useContext } from 'react';
 import { useRouter } from 'next/navigation';
 import { DatabaseContext } from '../context/DatabaseContext';
+import { getJobPath } from '../lib/jobRoute';
 import {
 	DotsVerticalIcon,
 	ArrowUpIcon,
@@ -13,14 +14,14 @@ import DeleteJobBtn from './DeleteJobBtn';
 import JobStatusDropdown from './JobStatusDropdown';
 
 const JobsTableRow = (job) => {
-	const { fetchCurrentJob, fetchCurrentPages, userProfile } =
-		useContext(DatabaseContext);
+	const { openJob, isJobLoading, userProfile } = useContext(DatabaseContext);
 	const router = useRouter();
 
-	const handleTableRowClick = async () => {
-		await fetchCurrentJob(job);
-		await fetchCurrentPages(job);
-		router.push(`/job/id:${job.id}`);
+	const handleTableRowClick = () => {
+		if (isJobLoading) return;
+
+		openJob(job);
+		router.push(getJobPath(job.id));
 	};
 
 	const targetSalaryIncrease =

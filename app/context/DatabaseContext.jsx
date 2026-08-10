@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useState, useEffect } from 'react';
+import { createContext, useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '../api/supabase';
 import { applyTheme } from '../lib/theme';
 import { normalizePageOrder } from '../lib/pageOrder';
@@ -374,8 +374,11 @@ const DatabaseProvider = ({ children }) => {
 	// *
 	// SET CURRENTLY VIEWED JOB DATA
 	const [currentPages, setCurrentPages] = useState([]);
-	const [currentJob, setCurrentJob] = useState([]);
+	const [currentJob, setCurrentJob] = useState(null);
 	const [selectedPageID, setSelectedPageID] = useState(null); // used to select a page to scroll to on page list
+	const [isJobLoading, setIsJobLoading] = useState(false);
+	const [loadingJobId, setLoadingJobId] = useState(null);
+	const openingJobIdRef = useRef(null);
 
 	// Initialize state from localStorage
 	useEffect(() => {
@@ -425,8 +428,31 @@ const DatabaseProvider = ({ children }) => {
 						.eq('id', page.id);
 				}),
 			);
+		} else {
+			localStorage.setItem('currentPages', JSON.stringify([]));
+			setCurrentPages([]);
 		}
 	}
+
+	const openJob = useCallback(async (job) => {
+		if (!job?.id) return;
+		if (openingJobIdRef.current === job.id) return;
+
+		openingJobIdRef.current = job.id;
+		setIsJobLoading(true);
+		setLoadingJobId(job.id);
+		setCurrentJob(job);
+		setCurrentPages([]);
+
+		try {
+			await fetchCurrentJob(job);
+			await fetchCurrentPages(job);
+		} finally {
+			openingJobIdRef.current = null;
+			setIsJobLoading(false);
+			setLoadingJobId(null);
+		}
+	}, []);
 
 	// *
 	// *
@@ -462,6 +488,9 @@ const DatabaseProvider = ({ children }) => {
 				fetchUserJobsClosed,
 				setCurrentJob,
 				fetchCurrentJob,
+				openJob,
+				isJobLoading,
+				loadingJobId,
 				createdJobID,
 				setCreatedJobID,
 				//Profiles

@@ -1,7 +1,9 @@
 'use client';
-import { useContext, useState, useEffect } from 'react';
+import { useContext, useEffect, useRef } from 'react';
+import { useParams } from 'next/navigation';
 import { DatabaseContext } from '../../../context/DatabaseContext';
 import { useFocusMode } from '../../../context/FocusModeContext';
+import { parseJobRouteId } from '../../../lib/jobRoute';
 import SideBar from '../../../components/SideBar';
 import TopBarJobDesktop from '../../../components/TopBarJobDesktop';
 import AddPageFab from '../../../components/AddPageFab';
@@ -9,17 +11,39 @@ import PageList from '../../../components/PageList';
 import Loader from '../../../components/Loader';
 
 const JobPage = () => {
-	const { currentPages } = useContext(DatabaseContext);
+	const { id } = useParams();
+	const routeJobId = parseJobRouteId(id);
+	const {
+		currentPages,
+		currentJob,
+		isJobLoading,
+		openJob,
+		userJobs,
+		userJobsClosed,
+	} = useContext(DatabaseContext);
 	const { focusPageId } = useFocusMode();
-	const [isLoading, setIsLoading] = useState(true);
+	const openJobRef = useRef(openJob);
+
+	openJobRef.current = openJob;
 
 	useEffect(() => {
-		if (currentPages) {
-			setIsLoading(false);
-		}
-	}, [currentPages]);
+		if (!routeJobId || isJobLoading) return;
+		if (String(currentJob?.id) === String(routeJobId)) return;
 
-	if (isLoading) {
+		const jobFromList = [...(userJobs ?? []), ...(userJobsClosed ?? [])].find(
+			(job) => String(job.id) === String(routeJobId),
+		);
+
+		openJobRef.current(jobFromList ?? { id: routeJobId });
+	}, [routeJobId, currentJob?.id, isJobLoading, userJobs, userJobsClosed]);
+
+	const isJobReady =
+		Boolean(routeJobId) &&
+		!isJobLoading &&
+		currentJob?.id &&
+		String(currentJob.id) === String(routeJobId);
+
+	if (!isJobReady) {
 		return (
 			<div className='flex justify-center items-center h-full'>
 				<Loader />

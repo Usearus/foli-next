@@ -190,7 +190,7 @@ const EditPreferencesBtn = () => {
 								{tempLocations.map((location) => (
 									<div
 										key={location}
-										className='badge badge-neutral gap-2 mt-2'>
+										className='badge badge-secondary gap-2 mt-2'>
 										{location}
 										<Cross2Icon
 											onClick={() => handleRemoveLocation(location)}

@@ -11,12 +11,15 @@ import { DEFAULT_USER } from '../../config/user';
 import ThemeToggle from '../../components/ThemeToggle';
 import ContentLoader from '../../components/ContentLoader';
 import EditPreferencesBtn from '../../components/EditPreferencesBtn';
+import EditAiContextBtn from '../../components/EditAiContextBtn';
+import AiContextDisplay from '../../components/AiContextDisplay';
 
 const Settings = () => {
 	const { userProfile, isProfileLoading } = useContext(DatabaseContext);
 
 	const profileRef = useRef(null);
 	const jobPreferencesRef = useRef(null);
+	const aiContextRef = useRef(null);
 	const contentRef = useRef(null);
 
 	const scrollToSection = (ref) => {
@@ -123,6 +126,13 @@ const Settings = () => {
 									type='button'
 									onClick={() => scrollToSection(jobPreferencesRef)}>
 									Job preferences
+								</button>
+							</li>
+							<li>
+								<button
+									type='button'
+									onClick={() => scrollToSection(aiContextRef)}>
+									AI context
 								</button>
 							</li>
 						</ul>
@@ -238,18 +248,35 @@ const Settings = () => {
 									<div className='flex gap-2 flex-wrap'>
 										{Array.isArray(userProfile.location_preference) &&
 											userProfile.location_preference.map((location) => (
-												<div key={location} className='badge bg-base-200 mt-2'>
+												<div
+													key={location}
+													className='badge badge-secondary mt-2'>
 													{location}
 												</div>
 											))}
 										{userProfile.location_remote ? (
-											<div className='badge bg-base-200 mt-2'>
+											<div className='badge badge-secondary mt-2'>
 												Remote / Hybrid
 											</div>
 										) : null}
 									</div>
 								</fieldset>
 							</div>
+						</div>
+					) : null}
+
+					{userProfile ? (
+						<div
+							ref={aiContextRef}
+							className='bg-base-100 rounded-box p-8 flex flex-col gap-6'>
+							<div className='flex justify-between items-center'>
+								<h2 className='text-xl font-bold'>AI context</h2>
+								<EditAiContextBtn />
+							</div>
+							<AiContextDisplay
+								content={userProfile.ai_context}
+								placeholder='No AI context yet. Add career background, tone, and what to emphasize when editing pages.'
+							/>
 						</div>
 					) : null}
 				</div>

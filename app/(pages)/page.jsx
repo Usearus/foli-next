@@ -4,12 +4,22 @@ import { useContext } from 'react';
 import { DatabaseContext } from '../context/DatabaseContext';
 import PaginatedJobsTable from '../components/PaginatedJobsTable';
 import TopBarJobs from '../components/TopBarJobs';
+import ContentLoader from '../components/ContentLoader';
 
 const Page = () => {
-	const { userJobs, userJobsClosed } = useContext(DatabaseContext);
+	const { userJobs, userJobsClosed, isJobLoading, isProfileLoading } =
+		useContext(DatabaseContext);
+
+	if (isProfileLoading || isJobLoading) {
+		return (
+			<div className='flex flex-col h-full text-base-content'>
+				<ContentLoader />
+			</div>
+		);
+	}
 
 	return (
-		<div className='flex flex-col h-full text-base-content'>
+		<div className='relative flex flex-col h-full text-base-content'>
 			<TopBarJobs />
 			<div className='grow overflow-y-auto flex flex-col'>
 				<div className='max-w-7xl mx-auto w-full py-4 flex flex-col'>

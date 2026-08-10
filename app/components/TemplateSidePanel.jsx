@@ -1,6 +1,7 @@
 'use client';
 
 import { useContext, useEffect, useMemo, useState } from 'react';
+import dynamic from 'next/dynamic';
 import MarkdownView from 'react-showdown';
 import { ArrowLeftIcon } from '@radix-ui/react-icons';
 import useAlert from '../alerts/useAlert';
@@ -8,9 +9,20 @@ import { supabase } from '../api/supabase';
 import { DEFAULT_USER } from '../config/user';
 import { DatabaseContext } from '../context/DatabaseContext';
 import { isMasterResumeTemplate } from '../lib/masterResumeTemplate';
+import { updateCustomTemplate } from '../lib/savePageAsTemplate';
 import SidePanel from './SidePanel';
 import DeleteTemplateButton from './DeleteTemplateButton';
 import { filterTemplatesForJobStage } from '../lib/templateStageMapping';
+
+const ReactQuillEditor = dynamic(() => import('./ReactQuillEditor'), {
+	ssr: false,
+});
+
+const TEMPLATE_TITLE_MAX_CHAR = 32;
+
+function canEditTemplate(template) {
+	return template?.category === 'Custom' && !isMasterResumeTemplate(template);
+}
 
 function TemplateCard({
 	template,
@@ -135,10 +147,20 @@ const TemplateSidePanel = ({ isOpen, onClose }) => {
 	} = useContext(DatabaseContext);
 
 	const templates = allTemplates || [];
+	const [isEditingTemplate, setIsEditingTemplate] = useState(false);
+	const [editTitle, setEditTitle] = useState('');
+	const [editContent, setEditContent] = useState('');
+
+	useEffect(() => {
+		if (!previewTemplate) {
+			setIsEditingTemplate(false);
+		}
+	}, [previewTemplate]);
 
 	const handleClose = () => {
 		setActiveTemplate(null);
 		setPreviewTemplate(false);
+		setIsEditingTemplate(false);
 		onClose();
 	};
 
@@ -150,6 +172,50 @@ const TemplateSidePanel = ({ isOpen, onClose }) => {
 	const handleCloseActiveTemplate = () => {
 		setActiveTemplate(null);
 		setPreviewTemplate(false);
+		setIsEditingTemplate(false);
+	};
+
+	const handleStartEditTemplate = () => {
+		if (!activeTemplate || !canEditTemplate(activeTemplate)) {
+			return;
+		}
+
+		setEditTitle(activeTemplate.title ?? '');
+		setEditContent(activeTemplate.content ?? '');
+		setIsEditingTemplate(true);
+	};
+
+	const handleCancelEditTemplate = () => {
+		setIsEditingTemplate(false);
+	};
+
+	const handleSaveTemplateEdit = async () => {
+		if (!activeTemplate) {
+			return;
+		}
+
+		const title = editTitle.trim();
+		if (!title) {
+			setAlert('Template title is required.', 'warning');
+			return;
+		}
+
+		const { data, error } = await updateCustomTemplate({
+			id: activeTemplate.id,
+			title,
+			content: editContent,
+		});
+
+		if (error) {
+			setAlert('Unable to update template.', 'error');
+			console.log(error);
+			return;
+		}
+
+		setActiveTemplate(data);
+		setIsEditingTemplate(false);
+		await fetchAllTemplates();
+		setAlert('Template updated', 'success');
 	};
 
 	const handleDeleteTemplate = async (template) => {
@@ -228,6 +294,8 @@ const TemplateSidePanel = ({ isOpen, onClose }) => {
 		() => filterTemplatesForJobStage(templates, jobStage),
 		[templates, jobStage],
 	);
+
+	const showEditTemplate = canEditTemplate(activeTemplate);
 
 	return (
 		<SidePanel isOpen={isOpen} onClose={handleClose} title='Templates'>
@@ -309,23 +377,76 @@ const TemplateSidePanel = ({ isOpen, onClose }) => {
 						onClick={handleCloseActiveTemplate}>
 						<ArrowLeftIcon /> Back to templates
 					</button>
-					<div className='p-4 bg-base-200 w-full shadow-md h-full flex flex-col'>
-						<header className='page-title'>
-							<h6 className='text-base font-bold'>{activeTemplate?.title}</h6>
+					<div className='p-4 bg-base-200 w-full shadow-md h-full flex flex-col min-h-0'>
+						<header className='page-title shrink-0'>
+							{isEditingTemplate ? (
+								<label className='form-control w-full gap-2'>
+									<span className='label-text font-bold'>Template title</span>
+									<input
+										type='text'
+										className='input input-bordered w-full bg-base-100'
+										value={editTitle}
+										maxLength={TEMPLATE_TITLE_MAX_CHAR}
+										onChange={(event) => setEditTitle(event.target.value)}
+									/>
+								</label>
+							) : (
+								<h6 className='text-base font-bold'>{activeTemplate?.title}</h6>
+							)}
 							<div className='divider m-0 pb-0.5' />
 						</header>
 
-						<MarkdownView
-							className='grow overflow-y-auto markdown-content'
-							markdown={activeTemplate?.content}
-						/>
-						<div className='flex gap-2 justify-end mt-4'>
-							<button
-								type='button'
-								className='btn btn-primary'
-								onClick={handleAddPageClick}>
-								Add page
-							</button>
+						<div className='grow min-h-0 overflow-y-auto'>
+							{isEditingTemplate ? (
+								<div className='page-sheet-editor page-sheet-editing-mode h-full min-h-48'>
+									<ReactQuillEditor
+										value={editContent}
+										onChange={setEditContent}
+										readOnly={false}
+									/>
+								</div>
+							) : (
+								<MarkdownView
+									className='markdown-content'
+									markdown={activeTemplate?.content}
+								/>
+							)}
+						</div>
+
+						<div className='flex gap-2 justify-end mt-4 shrink-0'>
+							{isEditingTemplate ? (
+								<>
+									<button
+										type='button'
+										className='btn btn-ghost btn-secondary'
+										onClick={handleCancelEditTemplate}>
+										Cancel
+									</button>
+									<button
+										type='button'
+										className='btn btn-primary'
+										onClick={handleSaveTemplateEdit}>
+										Save template
+									</button>
+								</>
+							) : (
+								<>
+									{showEditTemplate ? (
+										<button
+											type='button'
+											className='btn btn-secondary'
+											onClick={handleStartEditTemplate}>
+											Edit template
+										</button>
+									) : null}
+									<button
+										type='button'
+										className='btn btn-primary'
+										onClick={handleAddPageClick}>
+										Add page
+									</button>
+								</>
+							)}
 						</div>
 					</div>
 				</div>
