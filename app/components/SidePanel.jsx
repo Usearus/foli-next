@@ -29,7 +29,7 @@ const SidePanel = ({
 
 	const sidePanelContent = (
 		<div
-			className='z-50 fixed inset-0 bg-[#0f1214] bg-opacity-70 flex justify-end animate-fade-in'
+			className='z-50 fixed inset-0 bg-black/40 flex justify-end animate-fade-in'
 			onClick={onClose}>
 			<div
 				className={`w-full bg-base-100 p-4 lg:p-6 shadow-sm max-w-175 h-full ${animation}`}

@@ -1,91 +1,106 @@
 'use client';
-import { useState, useContext, useEffect } from 'react';
+
+import { useContext, useMemo, useState } from 'react';
+import { DragDropContext, Draggable } from '@hello-pangea/dnd';
 import { DatabaseContext } from '../context/DatabaseContext';
-import { DragDropContext, Draggable } from 'react-beautiful-dnd';
 import SideBarItem from './SideBarItem';
 import { supabase } from '../api/supabase';
-import { StrictModeDroppable } from './StrictModeDroppable'; // Import the StrictModeDroppable
+import { StrictModeDroppable } from './StrictModeDroppable';
+import {
+	normalizePageOrder,
+	pageOrderChanged,
+	reorderDraggablePages,
+	splitPagesByJobDescription,
+} from '../lib/pageOrder';
 
 const SideBar = () => {
 	const { currentPages, setCurrentPages } = useContext(DatabaseContext);
 	const [isDragging, setIsDragging] = useState(false);
 
-	useEffect(() => {
-		const pagesFromStorage = localStorage.getItem('currentPages');
-		const sortedPages = JSON.parse(pagesFromStorage).sort(
-			(a, b) => a.position - b.position
+	const { jobDescriptionPage, draggablePages } = useMemo(
+		() => splitPagesByJobDescription(currentPages),
+		[currentPages],
+	);
+
+	const persistPageOrder = async (nextPages) => {
+		setCurrentPages(nextPages);
+		localStorage.setItem('currentPages', JSON.stringify(nextPages));
+
+		await Promise.all(
+			nextPages.map((page, index) =>
+				supabase.from('pages').update({ position: index }).eq('id', page.id),
+			),
 		);
-		setCurrentPages(sortedPages);
-	}, [setCurrentPages]);
+	};
 
 	const updatePositionsOnDragEnd = async (result) => {
-		// console.log(result);
 		if (!result.destination) {
 			return;
 		}
 
-		const newCurrentPages = Array.from(currentPages);
-		const [reorderedItem] = newCurrentPages.splice(result.source.index, 1);
-		newCurrentPages.splice(result.destination.index, 0, reorderedItem);
+		const { source, destination } = result;
+		if (source.index === destination.index) {
+			return;
+		}
 
-		newCurrentPages.forEach((page, index) => {
-			page.position = index;
-		});
-
-		await Promise.all(
-			newCurrentPages.map(async (page, index) => {
-				await supabase
-					.from('pages')
-					.update({ position: index })
-					.eq('id', page.id);
-				// console.log('currentPages update', currentPages);
-			})
+		const nextPages = reorderDraggablePages(
+			currentPages,
+			source.index,
+			destination.index,
 		);
-		setCurrentPages(newCurrentPages);
-		localStorage.setItem('currentPages', JSON.stringify(newCurrentPages));
+
+		if (!pageOrderChanged(currentPages, nextPages)) {
+			return;
+		}
+
+		await persistPageOrder(nextPages);
 	};
 
 	return (
-		<>
-			{/* <label className='pl-4 pb-2 text-lg font-bold'>Pages</label> */}
+		<div className='scroll-container'>
+			{jobDescriptionPage ? (
+				<div className='mb-2'>
+					<SideBarItem page={jobDescriptionPage} />
+				</div>
+			) : null}
 
-			<div className='scroll-container'>
-				<DragDropContext
-					onDragStart={() => {
-						setIsDragging(true);
-					}}
-					onDragEnd={(result) => {
-						setIsDragging(false);
-						updatePositionsOnDragEnd(result);
-					}}>
-					<StrictModeDroppable droppableId='pages'>
-						{(provided) => (
-							<div
-								{...provided.droppableProps}
-								ref={provided.innerRef}
-								className={`draggable-area ${isDragging ? 'dragging' : ''}`}>
-								{currentPages.map((page, index) => (
-									<Draggable
-										key={page.id}
-										draggableId={String(page.id)}
-										index={index}>
-										{(provided) => (
-											<div
-												ref={provided.innerRef}
-												{...provided.draggableProps}
-												{...provided.dragHandleProps}>
-												<SideBarItem page={page} />
-											</div>
-										)}
-									</Draggable>
-								))}
-								{provided.placeholder}
-							</div>
-						)}
-					</StrictModeDroppable>
-				</DragDropContext>
-			</div>
-		</>
+			<DragDropContext
+				onDragStart={() => setIsDragging(true)}
+				onDragEnd={(result) => {
+					setIsDragging(false);
+					updatePositionsOnDragEnd(result);
+				}}>
+				<StrictModeDroppable droppableId='pages'>
+					{(provided) => (
+						<div
+							{...provided.droppableProps}
+							ref={provided.innerRef}
+							className={`draggable-area flex flex-col gap-2 rounded-xl transition-colors duration-150${isDragging ? ' dragging' : ''}`}>
+							{draggablePages.map((page, index) => (
+								<Draggable
+									key={page.id}
+									draggableId={String(page.id)}
+									index={index}>
+									{(provided, snapshot) => (
+										<div
+											ref={provided.innerRef}
+											{...provided.draggableProps}
+											{...provided.dragHandleProps}
+											style={provided.draggableProps.style}
+											className={`sidebar-draggable-item${
+												snapshot.isDragging ? ' is-dragging' : ''
+											}`}>
+											<SideBarItem page={page} />
+										</div>
+									)}
+								</Draggable>
+							))}
+							{provided.placeholder}
+						</div>
+					)}
+				</StrictModeDroppable>
+			</DragDropContext>
+		</div>
 	);
 };
 

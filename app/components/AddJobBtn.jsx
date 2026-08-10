@@ -79,6 +79,7 @@ const AddJobBtn = () => {
 			account: DEFAULT_USER.email,
 			jobid: newJobId,
 			locked: true,
+			position: 0,
 		});
 		setCreatedJobID(newJobId);
 		setIsModalOpen(false);

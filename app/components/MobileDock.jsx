@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
 	ChatBubbleIcon,
+	FileTextIcon,
 	HomeIcon,
 	Pencil1Icon,
 } from '@radix-ui/react-icons';
@@ -20,6 +21,7 @@ const userInitials = DEFAULT_USER.name
 
 const dockIcons = {
 	'/': HomeIcon,
+	'/resume': FileTextIcon,
 	'/practice': Pencil1Icon,
 	'/my-questions': ChatBubbleIcon,
 };

@@ -3,6 +3,7 @@
 import { createContext, useState, useEffect } from 'react';
 import { supabase } from '../api/supabase';
 import { applyTheme } from '../lib/theme';
+import { normalizePageOrder } from '../lib/pageOrder';
 import { DEFAULT_USER } from '../config/user';
 
 const DatabaseContext = createContext();
@@ -385,7 +386,7 @@ const DatabaseProvider = ({ children }) => {
 
 		const savedPages = localStorage.getItem('currentPages');
 		if (savedPages) {
-			setCurrentPages(JSON.parse(savedPages));
+			setCurrentPages(normalizePageOrder(JSON.parse(savedPages)));
 		}
 	}, []);
 
@@ -411,10 +412,19 @@ const DatabaseProvider = ({ children }) => {
 			.select('*')
 			.filter('jobid', 'eq', job.id);
 		if (data) {
-			// console.log('currentPages are', data);
-			localStorage.setItem('currentPages', JSON.stringify(data));
-			const sortedPages = [...data].sort((a, b) => a.position - b.position);
+			const sortedPages = normalizePageOrder(data);
+			localStorage.setItem('currentPages', JSON.stringify(sortedPages));
 			setCurrentPages(sortedPages);
+
+			await Promise.all(
+				sortedPages.map((page, index) => {
+					if (page.position === index) return Promise.resolve();
+					return supabase
+						.from('pages')
+						.update({ position: index })
+						.eq('id', page.id);
+				}),
+			);
 		}
 	}
 
@@ -472,6 +482,7 @@ const DatabaseProvider = ({ children }) => {
 				// Resumes
 				userResume,
 				fetchUserResume,
+				createUserResume,
 				// Settings
 				settingPageStack,
 				setSettingPageStack,

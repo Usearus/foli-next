@@ -505,3 +505,46 @@ body {
 .focus-mode-panel .page-scroll {
   height: auto;
 }
+
+/* DaisyUI collapse accordions — pointer on clickable header area */
+.collapse > input[type='checkbox'],
+.collapse > input[type='radio'] {
+  cursor: pointer;
+}
+
+.collapse > .collapse-title {
+  cursor: pointer;
+}
+
+.collapse > .collapse-content {
+  cursor: default;
+}
+
+.collapse > .collapse-content .card {
+  cursor: pointer;
+}
+
+/* Sidebar page drag-and-drop */
+.draggable-area.dragging {
+  background-color: var(--color-base-300);
+  outline: 2px dashed color-mix(in oklch, var(--color-base-content) 22%, transparent);
+  outline-offset: -2px;
+}
+
+.sidebar-draggable-item {
+  width: 100%;
+  cursor: grab;
+}
+
+.draggable-area.dragging .sidebar-draggable-item {
+  cursor: grabbing;
+}
+
+.sidebar-draggable-item.is-dragging {
+  box-shadow: 0 8px 20px color-mix(in oklch, var(--color-base-content) 16%, transparent);
+  border-radius: 0.5rem;
+}
+
+.sidebar-draggable-item.is-dragging .menu {
+  background-color: var(--color-base-100);
+}

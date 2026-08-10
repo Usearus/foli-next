@@ -6,6 +6,12 @@ export const mainNavItems = [
 		match: (pathname) => pathname === '/',
 	},
 	{
+		href: '/resume',
+		label: 'Resume',
+		id: 'resume',
+		match: (pathname) => pathname.startsWith('/resume'),
+	},
+	{
 		href: '/practice',
 		label: 'Practice',
 		id: 'practice',

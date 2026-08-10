@@ -11,6 +11,7 @@ const ReactQuillEditor = dynamic(() => import('./ReactQuillEditor'), {
 });
 import useAlert from '../alerts/useAlert';
 import DeletePageBtn from './DeletePageBtn';
+import SaveAsTemplateBtn from './SaveAsTemplateBtn';
 import FocusModeOverlay from './FocusModeOverlay';
 import {
 	DotsVerticalIcon,
@@ -261,6 +262,9 @@ const SinglePage = (page) => {
 		setContent(value);
 	};
 
+	const getDefaultTemplateTitle = () =>
+		(titleRef.current?.value ?? page.title ?? '').trim();
+
 	const handleUpdateContentClick = async () => {
 		if (page.locked) {
 			const { error } = await supabase
@@ -367,6 +371,13 @@ const SinglePage = (page) => {
 								<ul
 									tabIndex={0}
 									className='dropdown-content menu bg-base-200 rounded-box z-1 w-52 p-2 shadow'>
+									<li>
+										<SaveAsTemplateBtn
+											page={page}
+											content={content}
+											getDefaultTitle={getDefaultTemplateTitle}
+										/>
+									</li>
 									<li>
 										<DeletePageBtn page={page} />
 									</li>
