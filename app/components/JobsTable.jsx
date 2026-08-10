@@ -1,6 +1,10 @@
 'use client';
 
-import { InfoCircledIcon, ArrowUpIcon, ArrowDownIcon } from '@radix-ui/react-icons';
+import {
+	InfoCircledIcon,
+	ArrowUpIcon,
+	ArrowDownIcon,
+} from '@radix-ui/react-icons';
 import JobsTableRow from './JobsTableRow';
 
 const SortableHeader = ({
@@ -16,7 +20,7 @@ const SortableHeader = ({
 }) => {
 	const isActive = sortColumn === column && sortDirection;
 	const sortIndicator = isActive
-		? renderSortIndicator?.(sortDirection) ?? (
+		? (renderSortIndicator?.(sortDirection) ?? (
 				<>
 					{sortDirection === 'asc' ? (
 						<ArrowUpIcon className='shrink-0' />
@@ -25,7 +29,7 @@ const SortableHeader = ({
 						<ArrowDownIcon className='shrink-0' />
 					) : null}
 				</>
-			)
+			))
 		: null;
 
 	return (
@@ -62,7 +66,7 @@ const JobsTable = ({ jobs, sortColumn, sortDirection, onSort }) => {
 						sortColumn={sortColumn}
 						sortDirection={sortDirection}
 						onSort={onSort}
-						className='min-w-[100px] max-w-[200px]'
+						className='min-w-25 max-w-50'
 					/>
 					<SortableHeader
 						column='salary'

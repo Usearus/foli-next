@@ -97,7 +97,7 @@ const AddPageFab = () => {
 			{isMounted && isFabOpen
 				? createPortal(
 						<div
-							className='fixed inset-0 z-[998] bg-black/40 md:hidden'
+							className='fixed inset-0 z-998 bg-black/40 md:hidden'
 							aria-hidden='true'
 						/>,
 						document.body,

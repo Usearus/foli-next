@@ -92,7 +92,7 @@ const EmployerQuestionRow = ({
 					onChange={() => onToggle(questionItem.id)}
 					aria-label={`Select question: ${questionItem.question}`}
 				/>
-				<div className='flex-grow min-w-0 flex justify-between items-start gap-4'>
+				<div className='grow min-w-0 flex justify-between items-start gap-4'>
 					<h3 className='font-semibold text-base leading-snug'>
 						{questionItem.question}
 					</h3>
@@ -247,7 +247,7 @@ const EmployerQuestionList = ({ selectedIds, onToggle, onSelectionChange }) => {
 					value={searchQuery}
 					onChange={setSearchQuery}
 					placeholder='Search questions'
-					className='!w-[250px] shrink-0'
+					className='w-62.5! shrink-0'
 				/>
 			</div>
 			{filteredQuestions.length === 0 ? (

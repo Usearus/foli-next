@@ -32,7 +32,7 @@ const SidePanel = ({
 			className='z-50 fixed inset-0 bg-[#0f1214] bg-opacity-70 flex justify-end animate-fade-in'
 			onClick={onClose}>
 			<div
-				className={`w-full bg-base-100 p-4 lg:p-6 shadow-sm max-w-[700px] h-full ${animation}`}
+				className={`w-full bg-base-100 p-4 lg:p-6 shadow-sm max-w-175 h-full ${animation}`}
 				onClick={(event) => event.stopPropagation()}>
 				<div className='flex justify-between items-center pb-4'>
 					<h2 className='text-xl font-semibold py-1'>{title}</h2>
@@ -42,7 +42,7 @@ const SidePanel = ({
 						</button>
 					) : null}
 				</div>
-				<div className='h-full pb-[98px] overflow-y-auto'>{children}</div>
+				<div className='h-full pb-24.5 overflow-y-auto'>{children}</div>
 			</div>
 		</div>
 	);

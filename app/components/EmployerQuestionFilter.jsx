@@ -13,7 +13,10 @@ const EmployerQuestionFilter = ({ activeFilter, onFilterChange, counts }) => {
 	const handleFilterClick = (filter, event) => {
 		event.preventDefault();
 		onFilterChange(filter);
-		event.currentTarget.closest('.dropdown')?.querySelector('[tabindex="0"]')?.blur();
+		event.currentTarget
+			.closest('.dropdown')
+			?.querySelector('[tabindex="0"]')
+			?.blur();
 	};
 
 	return (
@@ -27,7 +30,7 @@ const EmployerQuestionFilter = ({ activeFilter, onFilterChange, counts }) => {
 						: 'btn-outline'
 				}`}
 				aria-label='Filter by category'>
-				<span className='max-w-[10rem] truncate'>{activeFilter}</span>
+				<span className='max-w-40 truncate'>{activeFilter}</span>
 				<span className='badge badge-neutral'>{activeCount}</span>
 				<ChevronDownIcon />
 			</div>
@@ -42,9 +45,7 @@ const EmployerQuestionFilter = ({ activeFilter, onFilterChange, counts }) => {
 						<li key={filter}>
 							<a
 								className={
-									isActive
-										? 'bg-secondary text-secondary-content'
-										: undefined
+									isActive ? 'bg-secondary text-secondary-content' : undefined
 								}
 								onClick={(event) => handleFilterClick(filter, event)}>
 								<span className='truncate'>{filter}</span>

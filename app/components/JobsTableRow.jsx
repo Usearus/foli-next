@@ -105,7 +105,7 @@ const JobsTableRow = (job) => {
 			className='transition-colors duration-200 ease-out hover:bg-base-content/5'>
 			<td
 				onClick={handleTableRowClick}
-				className='min-w-[100px] max-w-[200px] cursor-pointer'>
+				className='min-w-25 max-w-50 cursor-pointer'>
 				<div className='font-bold'>{job.company}</div>
 				<div className='font-light whitespace-nowrap overflow-hidden text-ellipsis'>
 					{job.position}
@@ -138,7 +138,7 @@ const JobsTableRow = (job) => {
 					</div>
 					<ul
 						tabIndex={0}
-						className='dropdown-content menu bg-base-200 rounded-box z-[1] w-52 p-2 shadow'>
+						className='dropdown-content menu bg-base-200 rounded-box z-1 w-52 p-2 shadow'>
 						<li onClick={(event) => event.stopPropagation()}>
 							<EditJobBtn job={job} label='Edit' />
 						</li>

@@ -28,9 +28,9 @@ const DeletePageIcon = ({ page }) => {
 		<>
 			<div
 				role='button'
-				className='btn btn-ghost hidden group-hover:flex transition-opacity duration-200'
+				className='btn btn-ghost btn-sm btn-square hidden group-hover:flex transition-opacity duration-200'
 				onClick={() => setIsModalOpen(true)}>
-				<TrashIcon />
+				<TrashIcon className='size-3.5' />
 			</div>
 
 			<Modal

@@ -15,8 +15,11 @@
     --quill-toolbar-background: var(--color-base-100);
     --quill-toolbar-border-color: var(--color-base-300);
     --quill-toolbar-button-color: var(--color-base-content);
-    --quill-toolbar-button-hover-color: var(--color-primary);
-    --quill-toolbar-button-active-color: var(--color-primary);
+    --quill-toolbar-button-hover-color: var(--color-secondary);
+    --quill-toolbar-button-active-color: var(--color-secondary);
+    --quill-toolbar-button-hover-bg: var(--color-base-100);
+    --quill-toolbar-button-active-bg: var(--color-base-100);
+    --quill-toolbar-button-active-fg: var(--color-secondary);
 
     --quill-neutral-content: color-mix(in srgb, var(--color-base-content) 60%, transparent);
 
@@ -37,8 +40,11 @@
     --quill-toolbar-background: var(--color-base-200);
     --quill-toolbar-border-color: var(--color-base-300);
     --quill-toolbar-button-color: var(--color-base-content);
-    --quill-toolbar-button-hover-color: var(--color-primary);
-    --quill-toolbar-button-active-color: var(--color-primary);
+    --quill-toolbar-button-hover-color: var(--color-secondary);
+    --quill-toolbar-button-active-color: var(--color-secondary);
+    --quill-toolbar-button-hover-bg: var(--color-base-100);
+    --quill-toolbar-button-active-bg: var(--color-base-100);
+    --quill-toolbar-button-active-fg: var(--color-secondary);
 
     --quill-neutral-content: color-mix(in srgb, var(--color-base-content) 60%, transparent);
 }
@@ -186,6 +192,75 @@
 
 .ql-toolbar.ql-snow .ql-formats:last-child {
     margin-right: 0;
+}
+
+/* Toolbar tooltips */
+.ql-snow.ql-toolbar .tooltip::before,
+.ql-snow.ql-toolbar .tooltip::after,
+.ql-snow .ql-toolbar .tooltip::before,
+.ql-snow .ql-toolbar .tooltip::after {
+    z-index: 20;
+}
+
+.ql-snow.ql-toolbar .tooltip,
+.ql-snow .ql-toolbar .tooltip {
+    position: relative;
+}
+
+.ql-snow.ql-toolbar .ql-picker.tooltip,
+.ql-snow .ql-toolbar .ql-picker.tooltip {
+    display: inline-block;
+}
+
+/* Toolbar control shapes (pagination-style) */
+.ql-snow.ql-toolbar button,
+.ql-snow .ql-toolbar button,
+.ql-snow.ql-toolbar .ql-picker-label,
+.ql-snow .ql-toolbar .ql-picker-label {
+    border-radius: 0.5rem !important;
+    transition:
+        background-color 150ms ease,
+        color 150ms ease,
+        border-color 150ms ease;
+}
+
+.ql-snow.ql-toolbar button:hover,
+.ql-snow .ql-toolbar button:hover,
+.ql-snow.ql-toolbar button:focus-visible,
+.ql-snow .ql-toolbar button:focus-visible,
+.ql-snow.ql-toolbar .ql-picker-label:hover,
+.ql-snow .ql-toolbar .ql-picker-label:hover {
+    background-color: var(--quill-toolbar-button-hover-bg) !important;
+}
+
+.ql-snow.ql-toolbar button.ql-active,
+.ql-snow .ql-toolbar button.ql-active,
+.ql-snow.ql-toolbar .ql-picker-label.ql-active,
+.ql-snow .ql-toolbar .ql-picker-label.ql-active {
+    background-color: var(--quill-toolbar-button-active-bg) !important;
+    color: var(--quill-toolbar-button-active-fg) !important;
+}
+
+.ql-snow.ql-toolbar button.ql-active .ql-fill,
+.ql-snow .ql-toolbar button.ql-active .ql-fill,
+.ql-snow.ql-toolbar button.ql-active .ql-stroke.ql-fill,
+.ql-snow .ql-toolbar button.ql-active .ql-stroke.ql-fill,
+.ql-snow.ql-toolbar .ql-picker-label.ql-active .ql-fill,
+.ql-snow .ql-toolbar .ql-picker-label.ql-active .ql-fill,
+.ql-snow.ql-toolbar .ql-picker-label.ql-active .ql-stroke.ql-fill,
+.ql-snow .ql-toolbar .ql-picker-label.ql-active .ql-stroke.ql-fill {
+    fill: var(--quill-toolbar-button-active-fg) !important;
+}
+
+.ql-snow.ql-toolbar button.ql-active .ql-stroke,
+.ql-snow .ql-toolbar button.ql-active .ql-stroke,
+.ql-snow.ql-toolbar button.ql-active .ql-stroke-miter,
+.ql-snow .ql-toolbar button.ql-active .ql-stroke-miter,
+.ql-snow.ql-toolbar .ql-picker-label.ql-active .ql-stroke,
+.ql-snow .ql-toolbar .ql-picker-label.ql-active .ql-stroke,
+.ql-snow.ql-toolbar .ql-picker-label.ql-active .ql-stroke-miter,
+.ql-snow .ql-toolbar .ql-picker-label.ql-active .ql-stroke-miter {
+    stroke: var(--quill-toolbar-button-active-fg) !important;
 }
 
 /* Default toolbar icon/text color (overrides quill.snow.css #444) */
@@ -449,23 +524,39 @@
 }
 
 .quill-selection-menu {
-    position: absolute;
-    z-index: 30;
+    position: fixed;
+    z-index: 1000;
     transform: translateX(-50%);
-    display: flex;
-    align-items: center;
-    gap: 0.125rem;
-    padding: 0.25rem;
-    border-radius: var(--quill-toolbar-border-radius);
-    background: var(--quill-toolbar-background);
-    border: 1px solid var(--quill-toolbar-border-color);
-    box-shadow: var(--quill-box-shadow);
+    padding: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
     pointer-events: auto;
 }
 
-.quill-selection-menu .btn:hover {
-    background-color: var(--color-primary);
-    color: var(--color-primary-content);
+.quill-selection-menu .aura {
+    --aura-radius: var(--quill-toolbar-border-radius);
+    border-radius: var(--quill-toolbar-border-radius);
+}
+
+.quill-selection-menu .aura .btn {
+    border-radius: var(--quill-toolbar-border-radius);
+    box-shadow: var(--quill-box-shadow);
+}
+
+.quill-selection-menu.dropdown::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: -0.5rem;
+    right: -0.5rem;
+    height: 0.5rem;
+}
+
+.quill-selection-menu .dropdown-content {
+    margin-top: 0;
+    top: calc(100% + 0.125rem);
+    z-index: 1001;
 }
 
 /* Custom size picker labels */

@@ -13,6 +13,8 @@ const PASTE_ALLOWED_ATTRIBUTES = new Set([
 	'list',
 	'indent',
 	'align',
+	'background',
+	'color',
 ]);
 
 export const sanitizePastedDelta = (delta) => {

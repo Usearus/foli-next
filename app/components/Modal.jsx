@@ -8,7 +8,7 @@ const Modal = ({ isOpen, onClose, children, title, closeButton = true }) => {
 
 	const modalContent = (
 		<div className='z-50 fixed inset-0 bg-black/40 flex items-center justify-center'>
-			<div className='bg-base-100 p-6 rounded-2xl shadow-sm w-full max-w-[95vw] md:max-w-[600px]'>
+			<div className='bg-base-100 p-6 rounded-2xl shadow-sm w-full max-w-[95vw] md:max-w-150'>
 				<div className='flex justify-between items-center'>
 					<h2 className='text-xl font-semibold py-1'>{title}</h2>
 					{closeButton ? (

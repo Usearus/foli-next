@@ -87,6 +87,8 @@ const SinglePage = (page) => {
 	const [editing, setEditing] = useState(false);
 	const [isFooterExiting, setIsFooterExiting] = useState(false);
 	const wasEditingRef = useRef(false);
+	const editingRef = useRef(editing);
+	editingRef.current = editing;
 	const [isMounted, setIsMounted] = useState(false);
 	const [showResizeHandle, setShowResizeHandle] = useState(false);
 
@@ -95,14 +97,16 @@ const SinglePage = (page) => {
 	}, []);
 
 	useEffect(() => {
-		if (!editing) {
-			setContent(page.content);
-			if (titleRef.current) {
-				titleRef.current.value = page.title ?? '';
-				setCharacterCount((page.title ?? '').length);
-			}
+		if (editingRef.current) {
+			return;
 		}
-	}, [page.content, page.title, editing]);
+
+		setContent(page.content);
+		if (titleRef.current) {
+			titleRef.current.value = page.title ?? '';
+			setCharacterCount((page.title ?? '').length);
+		}
+	}, [page.content, page.title]);
 
 	useEffect(() => {
 		if (editing) {
@@ -229,7 +233,14 @@ const SinglePage = (page) => {
 		window.addEventListener('keydown', handleEscape);
 
 		return () => window.removeEventListener('keydown', handleEscape);
-	}, [isFocusMode, page.content, page.title, focusPageId, page.id, exitFocusMode]);
+	}, [
+		isFocusMode,
+		page.content,
+		page.title,
+		focusPageId,
+		page.id,
+		exitFocusMode,
+	]);
 
 	// React Quill Editor Variables & Functions
 	const [content, setContent] = useState(page.content);
@@ -238,7 +249,9 @@ const SinglePage = (page) => {
 	const initialTitleValue = page.title ?? '';
 	const titleRef = useRef(null);
 	const titleMaxChar = 32;
-	const [characterCount, setCharacterCount] = useState(initialTitleValue.length);
+	const [characterCount, setCharacterCount] = useState(
+		initialTitleValue.length,
+	);
 
 	const handleTitleChange = (event) => {
 		setCharacterCount(event.target.value.length);
@@ -264,7 +277,7 @@ const SinglePage = (page) => {
 			}
 
 			setAlert('Page updated', 'success');
-			fetchCurrentPages(currentJob);
+			await fetchCurrentPages(currentJob);
 			setShowEditPageModal(false);
 			stopEditing();
 			return;
@@ -285,7 +298,7 @@ const SinglePage = (page) => {
 		}
 
 		setAlert('Page updated', 'success');
-		fetchCurrentPages(currentJob);
+		await fetchCurrentPages(currentJob);
 		setShowEditPageModal(false);
 		stopEditing();
 	};
@@ -298,12 +311,12 @@ const SinglePage = (page) => {
 		<article className='page-sheet-container bg-base-100 h-full w-full p-8 flex flex-col gap-2 shadow-sm'>
 			<div className='relative flex pt-2'>
 				{page.locked ? (
-					<label className='input input-ghost flex grow items-center gap-2 mb-[2px] mr-2 pl-6 pointer-events-none'>
+					<label className='input input-ghost flex grow items-center gap-2 mb-0.5 mr-2 pl-6 pointer-events-none'>
 						<span className='page-sheet-title font-bold'>{page.title}</span>
 					</label>
 				) : (
 					<label
-						className={`input input-ghost flex grow items-center gap-2 mb-[2px] mr-2 pl-6 ${
+						className={`input input-ghost flex grow items-center gap-2 mb-0.5 mr-2 pl-6 ${
 							editing ? '' : 'pointer-events-none'
 						}`}>
 						<input
@@ -353,7 +366,7 @@ const SinglePage = (page) => {
 								</div>
 								<ul
 									tabIndex={0}
-									className='dropdown-content menu bg-base-200 rounded-box z-[1] w-52 p-2 shadow'>
+									className='dropdown-content menu bg-base-200 rounded-box z-1 w-52 p-2 shadow'>
 									<li>
 										<DeletePageBtn page={page} />
 									</li>

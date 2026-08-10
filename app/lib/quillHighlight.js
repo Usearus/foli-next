@@ -1,19 +1,13 @@
 'use client';
 
-const DEFAULT_PRIMARY = '#7241c1';
+export const HIGHLIGHT_TEXT_COLOR = '#ffffff';
 
-export const getPrimaryHighlightColor = () => {
-	if (typeof window === 'undefined') {
-		return DEFAULT_PRIMARY;
-	}
-
-	const primary =
-		getComputedStyle(document.documentElement)
-			.getPropertyValue('--color-primary')
-			.trim() || DEFAULT_PRIMARY;
-
-	return primary;
-};
+export const HIGHLIGHT_OPTIONS = [
+	{ label: 'Green', color: '#5BC141' },
+	{ label: 'Gold', color: '#C19441' },
+	{ label: 'Red', color: '#C14141' },
+	{ label: 'Purple', color: '#7241C1' },
+];
 
 export const selectionHasBackground = (quill, range) => {
 	if (!quill || !range || range.length === 0) {

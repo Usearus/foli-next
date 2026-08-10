@@ -41,7 +41,7 @@ const PageList = () => {
 
 	if (visiblePages.length > 0) {
 		return (
-			<div className='flex gap-[3px] h-full overflow-x-auto'>
+			<div className='flex gap-0.75 h-full overflow-x-auto'>
 				{visiblePages.map((page, index) => {
 					const ref = createRef();
 					pageRef.current[index] = { id: page.id, ref };

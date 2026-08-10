@@ -9,7 +9,11 @@ import { DEFAULT_USER } from '../config/user';
 import { DatabaseContext } from '../context/DatabaseContext';
 import SidePanel from './SidePanel';
 
-function buildTemplateCategoryList(templates, onSelect, showCustomBadge = false) {
+function buildTemplateCategoryList(
+	templates,
+	onSelect,
+	showCustomBadge = false,
+) {
 	const categoryCounts = templates.reduce((counts, template) => {
 		const status = template.status;
 		counts[status] = (counts[status] || 0) + 1;
@@ -127,23 +131,23 @@ const TemplateSidePanel = ({ isOpen, onClose }) => {
 
 	const emailTemplateCategoryList = buildTemplateCategoryList(
 		templates.filter((template) => template.category === 'Emails'),
-		handleSetTemplateClick
+		handleSetTemplateClick,
 	);
 
 	const resourceTemplateCategoryList = buildTemplateCategoryList(
 		templates.filter((template) => template.category === 'Resources'),
-		handleSetTemplateClick
+		handleSetTemplateClick,
 	);
 
 	const documentTemplateCategoryList = buildTemplateCategoryList(
 		templates.filter((template) => template.category === 'Documents'),
-		handleSetTemplateClick
+		handleSetTemplateClick,
 	);
 
 	const customTemplateCategoryList = buildTemplateCategoryList(
 		templates.filter((template) => template.category === 'Custom'),
 		handleSetTemplateClick,
-		true
+		true,
 	);
 
 	return (
@@ -200,8 +204,8 @@ const TemplateSidePanel = ({ isOpen, onClose }) => {
 					<div role='tabpanel' className='tab-content pt-6'>
 						{customTemplateCategoryList.length === 0 ? (
 							<h4 className='text-lg'>
-								No custom templates created yet. Start by going to the options of
-								any page and clicking &quot;save as template&quot;.
+								No custom templates created yet. Start by going to the options
+								of any page and clicking &quot;save as template&quot;.
 							</h4>
 						) : (
 							<div className='join join-vertical w-full'>
@@ -221,11 +225,11 @@ const TemplateSidePanel = ({ isOpen, onClose }) => {
 					<div className='p-4 bg-base-200 w-full shadow-md h-full flex flex-col'>
 						<header className='page-title'>
 							<h6 className='text-base font-bold'>{activeTemplate?.title}</h6>
-							<div className='divider m-0 pb-[1px]' />
+							<div className='divider m-0 pb-0.5' />
 						</header>
 
 						<MarkdownView
-							className='flex-grow overflow-y-auto markdown-content'
+							className='grow overflow-y-auto markdown-content'
 							markdown={activeTemplate?.content}
 						/>
 						<div className='flex gap-2 justify-end mt-4'>

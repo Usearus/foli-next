@@ -14,7 +14,7 @@ const TopBarJobDesktop = () => {
 	return (
 		<div className='p-4 row-span-1 col-span-1 lg:col-span-2 bg-base-200 flex items-center justify-between gap-4 z-10'>
 			<div className='flex gap-6 items-center min-w-0 flex-1'>
-				<div className='w-[222px] shrink-0'>
+				<div className='w-55.5 shrink-0'>
 					<p className='font-bold whitespace-nowrap overflow-hidden text-ellipsis'>
 						{currentJob.company}
 					</p>

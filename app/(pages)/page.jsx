@@ -11,7 +11,7 @@ const Page = () => {
 	return (
 		<div className='flex flex-col h-full text-base-content'>
 			<TopBarJobs />
-			<div className='flex-grow overflow-y-auto flex flex-col'>
+			<div className='grow overflow-y-auto flex flex-col'>
 				<div className='max-w-7xl mx-auto w-full py-4 flex flex-col'>
 					<div role='tablist' className='tabs tabs-box w-full p-0'>
 						<input

@@ -35,9 +35,9 @@ const Settings = () => {
 	if (isProfileLoading) {
 		return (
 			<div className='h-full min-h-0 text-base-content px-0 py-4 flex'>
-				<div className='w-[350px] hidden lg:flex shrink-0' />
-				<div className='flex flex-1 min-h-0 justify-center w-full overflow-y-auto'>
-					<ContentLoader className='max-w-[700px]' />
+				<div className='w-87.5 hidden lg:flex shrink-0' />
+				<div className='flex flex-1 min-h-0 justify-center w-full overflow-y-auto px-1'>
+					<ContentLoader className='max-w-175' />
 				</div>
 			</div>
 		);
@@ -106,7 +106,7 @@ const Settings = () => {
 	return (
 		<div className='h-full min-h-0 text-base-content px-0 py-4 flex'>
 			{/* Sidebar */}
-			<div className='w-[350px] hidden lg:flex shrink-0'>
+			<div className=' w-87.5 hidden lg:flex shrink-0'>
 				<ul className='menu'>
 					<li>
 						<span className='font-bold'>General</span>
@@ -166,7 +166,7 @@ const Settings = () => {
 			<div
 				ref={contentRef}
 				className='flex flex-1 min-h-0 justify-center w-full overflow-y-auto'>
-				<div className='max-w-[700px] w-full p-4 flex flex-col gap-4'>
+				<div className='max-w-175 w-full p-4 flex flex-col gap-4'>
 					<div
 						ref={profileRef}
 						className='bg-base-100 rounded-box p-8 flex flex-col gap-6'>

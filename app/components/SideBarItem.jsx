@@ -42,8 +42,12 @@ const SideBarItem = ({ page, setShowOffcanvas, showOffcanvas }) => {
 						<div
 							role='button'
 							onClick={handleVisibilityClick}
-							className='btn btn-ghost'>
-							{page.visible ? <EyeOpenIcon /> : <EyeClosedIcon />}
+							className='btn btn-ghost btn-sm btn-square'>
+							{page.visible ? (
+								<EyeOpenIcon className='size-3.5' />
+							) : (
+								<EyeClosedIcon className='size-3.5' />
+							)}
 						</div>
 					</div>
 				</div>
