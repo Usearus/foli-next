@@ -8,19 +8,16 @@ import TopBarMyQuestions from '../../components/TopBarMyQuestions';
 import EmployerQuestionList from '../../components/EmployerQuestionList';
 import {
 	copyMyQuestionsToClipboard,
-	getSelectedMyQuestionIds,
 	isMyQuestion,
-	setSelectedMyQuestionIds,
 } from '../../lib/questions';
 
 const MyQuestionsPage = () => {
 	const { userQuestions, isQuestionsLoading } = useContext(DatabaseContext);
 	const { setAlert } = useAlert();
-	const [selectedIds, setSelectedIds] = useState(getSelectedMyQuestionIds);
+	const [selectedIds, setSelectedIds] = useState([]);
 
 	const handleSelectionChange = useCallback((ids) => {
 		setSelectedIds(ids);
-		setSelectedMyQuestionIds(ids);
 	}, []);
 
 	const handleToggle = useCallback(

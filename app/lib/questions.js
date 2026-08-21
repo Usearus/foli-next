@@ -61,21 +61,6 @@ export function filterQuestionsBySearch(questions, query) {
 	});
 }
 
-export const SELECTED_MY_QUESTIONS_KEY = 'foli-selected-employer-questions';
-
-export function getSelectedMyQuestionIds() {
-	try {
-		const stored = localStorage.getItem(SELECTED_MY_QUESTIONS_KEY);
-		return stored ? JSON.parse(stored) : [];
-	} catch {
-		return [];
-	}
-}
-
-export function setSelectedMyQuestionIds(ids) {
-	localStorage.setItem(SELECTED_MY_QUESTIONS_KEY, JSON.stringify(ids));
-}
-
 export function formatMyQuestionsForSheet(questions) {
 	const items = questions.map((q) => q.question?.trim()).filter(Boolean);
 
