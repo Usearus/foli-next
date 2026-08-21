@@ -458,12 +458,17 @@ body {
   transition: background-color 150ms ease;
 }
 
-.page-sheet-container--editing {
-  background-color: #fafafa;
+:root {
+  --sheet-active-bg: #fafafa;
 }
 
-[data-theme='dark'] .page-sheet-container--editing {
-  background-color: #2e3644;
+[data-theme='dark'] {
+  --sheet-active-bg: #2e3644;
+}
+
+.page-sheet-container--editing,
+.bg-sheet-active {
+  background-color: var(--sheet-active-bg);
 }
 
 @media (hover: hover) {

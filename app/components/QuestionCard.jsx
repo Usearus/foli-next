@@ -89,13 +89,24 @@ const QuestionCard = ({ questionItem }) => {
 
 	return (
 		<div className='bg-base-100 rounded-xl overflow-hidden shadow-sm'>
-			<div className='p-5 flex justify-between items-start gap-4'>
-				<div className='flex flex-col min-w-0 flex-1'>
+			<div
+				className={`relative p-5 flex justify-between items-center gap-4 ${
+					editing ? '' : 'cursor-pointer'
+				}`}>
+				<button
+					type='button'
+					className='absolute inset-0 z-0 bg-transparent cursor-pointer disabled:cursor-default'
+					onClick={toggleExpanded}
+					disabled={editing}
+					aria-expanded={isExpanded}
+					aria-label={isExpanded ? 'Collapse question' : 'Expand question'}
+				/>
+				<div className='relative z-10 pointer-events-none flex flex-col min-w-0 flex-1 justify-center'>
 					<h3 className='font-semibold text-base leading-snug'>
 						{questionItem.question}
 					</h3>
 				</div>
-				<div className='flex items-center gap-1 shrink-0'>
+				<div className='relative z-10 flex items-center gap-1 shrink-0'>
 					{isExpanded ? (
 						<>
 							{!editing ? (
@@ -116,24 +127,20 @@ const QuestionCard = ({ questionItem }) => {
 							</button>
 						</>
 					) : null}
-					<button
-						type='button'
-						className='btn btn-ghost btn-square'
-						onClick={toggleExpanded}
-						disabled={editing}
-						aria-label={isExpanded ? 'Collapse question' : 'Expand question'}
-						aria-expanded={isExpanded}>
+					<span
+						className='btn btn-ghost btn-square pointer-events-none'
+						aria-hidden='true'>
 						<ChevronDownIcon
 							className={`transition-transform duration-200 ${
 								isExpanded ? 'rotate-180' : ''
 							}`}
 						/>
-					</button>
+					</span>
 				</div>
 			</div>
 
 			{isExpanded ? (
-				<div className='px-5 pb-5 flex flex-col gap-3'>
+				<div className='w-full bg-sheet-active px-5 py-5 flex flex-col gap-3'>
 					{editing ? (
 						<div className='flex flex-col gap-3'>
 							<fieldset className='fieldset'>
@@ -201,24 +208,21 @@ const QuestionCard = ({ questionItem }) => {
 							</div>
 						</div>
 					) : (
-						<>
-							<div className='divider my-0' />
-							<div>
-								<p className='text-xs font-semibold uppercase tracking-wide text-base-content/60 mb-1'>
-									Your answer
+						<div>
+							<p className='text-xs font-semibold uppercase tracking-wide text-base-content/60 mb-1'>
+								Your answer
+							</p>
+							{questionItem.response ? (
+								<p className='text-sm whitespace-pre-wrap leading-relaxed font-mono'>
+									{questionItem.response}
 								</p>
-								{questionItem.response ? (
-									<p className='text-sm whitespace-pre-wrap leading-relaxed font-mono'>
-										{questionItem.response}
-									</p>
-								) : (
-									<p className='text-sm italic text-base-content/50'>
-										No answer yet — click Edit to draft your response
-										{showStarBadge ? ' using STAR' : ''}.
-									</p>
-								)}
-							</div>
-						</>
+							) : (
+								<p className='text-sm italic text-base-content/50'>
+									No answer yet — click Edit to draft your response
+									{showStarBadge ? ' using STAR' : ''}.
+								</p>
+							)}
+						</div>
 					)}
 				</div>
 			) : null}
