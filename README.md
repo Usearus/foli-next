@@ -7,12 +7,12 @@ Job search workspace built with Next.js, Supabase, and DaisyUI.
 ### Prerequisites
 
 - [Node.js](https://nodejs.org/) 18 or later
-- npm (included with Node.js)
+- [pnpm](https://pnpm.io/installation) 10 or later
 
 ### Install dependencies
 
 ```bash
-npm install
+pnpm install
 ```
 
 ### Environment variables
@@ -29,7 +29,7 @@ OPENAI_API_KEY=sk-your_openai_api_key
 ### Run the development server
 
 ```bash
-npm run dev
+pnpm dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
@@ -38,13 +38,13 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ```bash
 # Production build
-npm run build
+pnpm build
 
 # Run production build locally
-npm run start
+pnpm start
 
 # Lint
-npm run lint
+pnpm lint
 ```
 
 
