@@ -61,6 +61,43 @@ function scaleInlineFonts(root) {
 	});
 }
 
+function isMostlyBlankRow(context, width, y) {
+	const { data } = context.getImageData(0, y, width, 1);
+	const inkLimit = Math.max(4, Math.floor(width * 0.008));
+	let ink = 0;
+
+	for (let index = 0; index < data.length; index += 4) {
+		if (data[index] < 248 || data[index + 1] < 248 || data[index + 2] < 248) {
+			ink += 1;
+			if (ink > inkLimit) {
+				return false;
+			}
+		}
+	}
+
+	return true;
+}
+
+function findLineSafeBreak(context, width, startY, intendedEnd, canvasHeight) {
+	if (intendedEnd >= canvasHeight) {
+		return canvasHeight;
+	}
+
+	if (!context) {
+		return intendedEnd;
+	}
+
+	const minY = startY + Math.floor((intendedEnd - startY) * 0.65);
+
+	for (let y = intendedEnd - 1; y > minY; y -= 1) {
+		if (isMostlyBlankRow(context, width, y)) {
+			return y + 1;
+		}
+	}
+
+	return intendedEnd;
+}
+
 export async function exportSheetPdf({ company, title, content }) {
 	if (typeof window === 'undefined' || typeof document === 'undefined') {
 		throw new Error('PDF export is only available in the browser');
@@ -117,12 +154,21 @@ export async function exportSheetPdf({ company, title, content }) {
 		const contentHeight = pageHeight - PDF_MARGIN_PT * 2;
 		const pixelsPerPt = canvas.width / contentWidth;
 		const pageSourceHeight = Math.max(Math.floor(contentHeight * pixelsPerPt), 1);
+		const sourceContext = canvas.getContext('2d', { willReadFrequently: true });
 
 		let sourceY = 0;
 		let pageIndex = 0;
 
 		while (sourceY < canvas.height) {
-			const sliceHeight = Math.min(pageSourceHeight, canvas.height - sourceY);
+			const intendedEnd = Math.min(sourceY + pageSourceHeight, canvas.height);
+			const breakY = findLineSafeBreak(
+				sourceContext,
+				canvas.width,
+				sourceY,
+				intendedEnd,
+				canvas.height,
+			);
+			const sliceHeight = Math.max(breakY - sourceY, 1);
 			const sliceCanvas = document.createElement('canvas');
 			sliceCanvas.width = canvas.width;
 			sliceCanvas.height = sliceHeight;
