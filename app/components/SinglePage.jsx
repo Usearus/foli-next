@@ -12,6 +12,7 @@ const ReactQuillEditor = dynamic(() => import('./ReactQuillEditor'), {
 import useAlert from '../alerts/useAlert';
 import DeletePageBtn from './DeletePageBtn';
 import SaveAsTemplateBtn from './SaveAsTemplateBtn';
+import ExportSheetPdfBtn from './ExportSheetPdfBtn';
 import HidePageBtn from './HidePageBtn';
 import AiAssistBtn from './AiAssistBtn';
 import FocusModeOverlay from './FocusModeOverlay';
@@ -423,6 +424,14 @@ const SinglePage = (page) => {
 												<EnterFullScreenIcon className='inline-block size-4 mr-2 shrink-0' />
 												Focus mode
 											</button>
+										</li>
+										<li onClick={(event) => event.stopPropagation()}>
+											<ExportSheetPdfBtn
+												company={currentJob?.company}
+												title={page.title}
+												content={content}
+												getTitle={getDefaultTemplateTitle}
+											/>
 										</li>
 										{!page.locked ? (
 											<li>

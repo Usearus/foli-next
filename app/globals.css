@@ -857,3 +857,69 @@ body {
     opacity: 0.95;
   }
 }
+
+.sheet-pdf-export {
+  position: fixed;
+  left: -10000px;
+  top: 0;
+  z-index: -1;
+  width: 680px;
+  max-height: none !important;
+  height: auto !important;
+  overflow: visible !important;
+  background-color: #ffffff !important;
+  color: #111111 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  pointer-events: none;
+}
+
+.sheet-pdf-export,
+.sheet-pdf-export * {
+  color: #111111 !important;
+}
+
+.sheet-pdf-export a {
+  text-decoration: underline;
+}
+
+.sheet-pdf-export .page-sheet-prose,
+.sheet-pdf-export .sheet-pdf-export__body {
+  padding: 0 !important;
+  min-height: 0 !important;
+  height: auto !important;
+  overflow: visible !important;
+  font-size: 13.5px !important;
+  line-height: 1.45 !important;
+}
+
+.sheet-pdf-export .page-sheet-prose p {
+  margin: 0 0 0.75em !important;
+}
+
+.sheet-pdf-export .page-sheet-prose ol,
+.sheet-pdf-export .page-sheet-prose ul {
+  margin: 0.2em 0 0.4em !important;
+}
+
+.sheet-pdf-export .page-sheet-prose li {
+  padding-bottom: 0.2em !important;
+}
+
+.sheet-pdf-export .page-sheet-prose h1 {
+  font-size: 1.3em !important;
+  margin: 0.7em 0 0.3em !important;
+}
+
+.sheet-pdf-export .page-sheet-prose h2 {
+  font-size: 1.15em !important;
+  margin: 0.65em 0 0.25em !important;
+}
+
+.sheet-pdf-export .page-sheet-prose h3,
+.sheet-pdf-export .page-sheet-prose h4,
+.sheet-pdf-export .page-sheet-prose h5,
+.sheet-pdf-export .page-sheet-prose h6 {
+  font-size: 1em !important;
+  margin: 0.55em 0 0.2em !important;
+}
