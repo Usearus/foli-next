@@ -14,7 +14,6 @@ const PASTE_ALLOWED_ATTRIBUTES = new Set([
 	'indent',
 	'align',
 	'background',
-	'color',
 ]);
 
 export const sanitizePastedDelta = (delta) => {
@@ -66,7 +65,21 @@ export const setupQuillPasteSanitizer = (quill) => {
 
 	quill.__foliPasteSanitizer = true;
 
-	clipboard.addMatcher(Node.ELEMENT_NODE, (_node, delta) =>
-		sanitizePastedDelta(delta),
-	);
+	let isUserPaste = false;
+	const markUserPaste = () => {
+		isUserPaste = true;
+		queueMicrotask(() => {
+			isUserPaste = false;
+		});
+	};
+
+	quill.root.addEventListener('paste', markUserPaste, true);
+
+	clipboard.addMatcher(Node.ELEMENT_NODE, (_node, delta) => {
+		if (!isUserPaste) {
+			return delta;
+		}
+
+		return sanitizePastedDelta(delta);
+	});
 };
