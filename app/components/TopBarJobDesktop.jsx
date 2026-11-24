@@ -1,20 +1,23 @@
 'use client';
 import { useContext } from 'react';
+import Link from 'next/link';
 import { DatabaseContext } from '../context/DatabaseContext';
-import { DotsVerticalIcon } from '@radix-ui/react-icons';
+import { ArrowLeftIcon, DotsVerticalIcon } from '@radix-ui/react-icons';
 import AddPageDropdown from './AddPageDropdown';
 import EditJobBtn from './EditJobBtn';
 import DeleteJobBtn from './DeleteJobBtn';
 import JobStatusSteps from './JobStatusSteps';
-import JobStatusDropdown from './JobStatusDropdown';
 
 const TopBarJobDesktop = () => {
 	const { currentJob } = useContext(DatabaseContext);
 
 	return (
-		<div className='p-4 row-span-1 col-span-1 lg:col-span-2 bg-base-200 flex items-center justify-between gap-4 z-10'>
-			<div className='flex gap-6 items-center min-w-0 flex-1'>
-				<div className='w-55.5 shrink-0'>
+		<div className='relative z-50 p-4 max-lg:pt-2 max-lg:px-2 max-lg:pb-4 row-span-1 col-span-1 lg:col-span-2 bg-base-200 flex items-center justify-between gap-4'>
+			<div className='flex gap-2 md:gap-6 items-center min-w-0 flex-1'>
+				<Link href='/' className='btn btn-ghost md:hidden shrink-0' aria-label='Back to tracker'>
+					<ArrowLeftIcon />
+				</Link>
+				<div className='min-w-0 md:w-55.5 md:shrink-0'>
 					<p className='font-bold whitespace-nowrap overflow-hidden text-ellipsis'>
 						{currentJob.company}
 					</p>
@@ -34,9 +37,6 @@ const TopBarJobDesktop = () => {
 				<div className='min-w-0 flex-1 hidden lg:block'>
 					<JobStatusSteps job={currentJob} />
 				</div>
-				<div className='lg:hidden shrink-0'>
-					<JobStatusDropdown job={currentJob} />
-				</div>
 			</div>
 			<div className='flex items-center shrink-0'>
 				<div className='hidden md:block'>
@@ -48,7 +48,7 @@ const TopBarJobDesktop = () => {
 					</div>
 					<ul
 						tabIndex={0}
-						className='dropdown-content menu bg-base-100 rounded-box z-10 w-52 p-2 shadow'>
+						className='dropdown-content menu bg-base-100 rounded-box z-50 w-52 p-2 shadow'>
 						<li>
 							<EditJobBtn job={currentJob} />
 						</li>

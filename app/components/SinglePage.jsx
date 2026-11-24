@@ -54,11 +54,18 @@ const SinglePage = (page) => {
 
 	// PAGE FUNCTIONS
 	const initialVisibleValue = page.visible;
-	// Check width on load and render mobile or desktop pages
-	const isMobile = window.matchMedia('(max-width: 768px)').matches;
+	const [isMobile, setIsMobile] = useState(false);
 
 	// Resizing
 	const [pageWidth, setPageWidth] = useState(page.width || DEFAULT_PAGE_WIDTH);
+
+	useEffect(() => {
+		const media = window.matchMedia('(max-width: 1023px)');
+		const syncIsMobile = () => setIsMobile(media.matches);
+		syncIsMobile();
+		media.addEventListener('change', syncIsMobile);
+		return () => media.removeEventListener('change', syncIsMobile);
+	}, []);
 
 	useEffect(() => {
 		// Function to fetch and set the page width from the database
@@ -143,7 +150,7 @@ const SinglePage = (page) => {
 	const showFooter = editing || isFooterExiting;
 
 	const handleSheetMouseMove = (event) => {
-		if (window.matchMedia('(max-width: 768px)').matches) {
+		if (window.matchMedia('(max-width: 1023px)').matches) {
 			return;
 		}
 
@@ -371,11 +378,13 @@ const SinglePage = (page) => {
 					</label>
 				)}
 				<div className='page-sheet-actions shrink-0 flex justify-end gap-0 z-30'>
-					<AiAssistBtn
-						pageId={page.id}
-						jobId={currentJob?.id}
-						onApply={handleAiApply}
-					/>
+					{editing ? (
+						<AiAssistBtn
+							pageId={page.id}
+							jobId={currentJob?.id}
+							onApply={handleAiApply}
+						/>
+					) : null}
 					{isFocusMode ? (
 						<button
 							type='button'
@@ -552,27 +561,31 @@ const SinglePage = (page) => {
 				aria-hidden='true'
 			/>
 			<Resizable
-				enable={{
-					top: false,
-					right: true,
-					bottom: false,
-					left: false,
-					topRight: false,
-					bottomRight: false,
-					bottomLeft: false,
-					topLeft: false,
-				}}
+				enable={
+					isMobile
+						? false
+						: {
+								top: false,
+								right: true,
+								bottom: false,
+								left: false,
+								topRight: false,
+								bottomRight: false,
+								bottomLeft: false,
+								topLeft: false,
+							}
+				}
 				onResize={(e, direction, ref) => {
 					setPageWidth(ref.offsetWidth);
 				}}
 				onResizeStop={(e, direction, ref) => {
 					handleUpdateWidthClick(ref.offsetWidth);
 				}}
-				minWidth={`${MIN_PAGE_WIDTH}px`}
-				maxWidth={`${FOCUS_MODE_MAX_WIDTH}px`}
+				minWidth={isMobile ? '100%' : `${MIN_PAGE_WIDTH}px`}
+				maxWidth={isMobile ? '100%' : `${FOCUS_MODE_MAX_WIDTH}px`}
 				className='page-sheet-resizable'
 				size={{
-					width: pageWidth,
+					width: isMobile ? '100%' : pageWidth,
 				}}>
 				{sheetArticle}
 			</Resizable>

@@ -368,6 +368,78 @@ body {
 
 .page-list {
   max-height: 100%;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: 0;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+}
+
+.page-sheet-column {
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+
+@media (max-width: 1023px) {
+  .page-list {
+    gap: 0;
+  }
+
+  .page-sheet-column {
+    flex: 0 0 100%;
+    width: 100%;
+    min-width: 100%;
+    max-width: 100%;
+    height: 100%;
+    margin-right: 0.75rem;
+  }
+
+  .page-list .page-sheet-shell,
+  .page-list .page-sheet-resizable,
+  .page-list .page-sheet-container {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+
+  .page-list .page-sheet-resize-handle {
+    display: none;
+  }
+
+  .page-list-end-spacer {
+    display: none;
+  }
+
+  .page-list-fade-left,
+  .page-list-shell--scrolled .page-list-fade-left {
+    display: none;
+  }
+
+  .page-list .page-sheet-container {
+    padding: 1rem !important;
+  }
+
+  .page-list .page-sheet-header {
+    padding-top: 0;
+  }
+
+  .page-list .page-sheet-header > label {
+    padding-left: 0.75rem;
+  }
+
+  .page-list .page-sheet-title {
+    font-size: 1.125rem;
+  }
+
+  .page-list .page-sheet-container .page-sheet-prose {
+    padding: 0.75rem !important;
+    font-size: 15px !important;
+    line-height: 1.65 !important;
+  }
+
+  .page-list .page-sheet-container .page-sheet-actions {
+    opacity: 1;
+    pointer-events: auto;
+  }
 }
 
 .page-list-shell {
@@ -591,7 +663,7 @@ body {
 }
 
 .add-page-fab.fab {
-  bottom: calc(4rem + env(safe-area-inset-bottom, 0px) + 1rem);
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 1rem);
   z-index: 999;
 }
 

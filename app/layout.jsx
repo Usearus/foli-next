@@ -6,6 +6,7 @@ import './quillStyles.css';
 import { DatabaseProvider } from './context/DatabaseContext';
 import { FocusModeProvider } from './context/FocusModeContext';
 import NavBar from './components/NavBar';
+import AppMain from './components/AppMain';
 import MobileDock from './components/MobileDock';
 import AlertPopup from './alerts/AlertPopup';
 import { AlertProvider } from './alerts/AlertContext';
@@ -43,9 +44,7 @@ export default function RootLayout({ children }) {
 							<div className='flex flex-col h-screen bg-base-200 relative'>
 								<NavBar />
 								<AlertPopup />
-								<div className='grow min-h-0 overflow-y-auto pb-[calc(4rem+env(safe-area-inset-bottom))] md:pb-0'>
-									{children}
-								</div>
+								<AppMain>{children}</AppMain>
 								<MobileDock />
 							</div>
 						</AlertProvider>

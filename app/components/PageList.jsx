@@ -102,14 +102,12 @@ const PageList = () => {
 		const pageToScrollTo = pageRef.current.find(
 			(page) => page.id === selectedPageID,
 		);
-		if (pageToScrollTo && pageToScrollTo.ref.current) {
-			pageToScrollTo.ref.current.scrollIntoView({ behavior: 'smooth' });
-		} else {
-			const firstPage = pageRef.current[0];
-			if (firstPage && firstPage.ref.current) {
-				firstPage.ref.current.scrollIntoView({ behavior: 'smooth' });
-			}
-		}
+		const scrollTarget = pageToScrollTo?.ref.current ?? pageRef.current[0]?.ref.current;
+		scrollTarget?.scrollIntoView({
+			behavior: 'smooth',
+			inline: 'start',
+			block: 'nearest',
+		});
 
 		prevLengthRef.current = currentPages.length;
 	}, [selectedPageID, currentPages.length, scrollPageListToEndRequest]);
@@ -123,7 +121,7 @@ const PageList = () => {
 				<div
 					ref={listRef}
 					onScroll={updateLeftFade}
-					className='page-list flex h-full min-h-0 w-full flex-1 items-start gap-0.75 overflow-x-auto overflow-y-hidden'>
+					className='page-list flex h-full min-h-0 w-full flex-1 items-start gap-0.75 overflow-x-auto overflow-y-hidden max-lg:items-stretch max-lg:gap-0'>
 					{visiblePages.map((page, index) => {
 						const ref = createRef();
 						pageRef.current[index] = { id: page.id, ref };
@@ -133,7 +131,6 @@ const PageList = () => {
 						return (
 							<div
 								key={page.id}
-								style={{ scrollSnapAlign: 'center' }}
 								className={`page-sheet-column shrink-0 ${pageClassName}`}
 								ref={ref}>
 								<SinglePage key={page.id} id={page.id} {...page} />

@@ -69,7 +69,7 @@ const JobPage = () => {
 						<SideBar />
 					</div>
 
-					<div className='row-span-1 col-span-1 flex min-h-0 flex-col overflow-hidden bg-base-200 p-4'>
+					<div className='relative z-0 row-span-1 col-span-1 flex min-h-0 flex-col overflow-hidden bg-base-200 p-4 max-lg:p-0'>
 						<PageList />
 					</div>
 				</div>

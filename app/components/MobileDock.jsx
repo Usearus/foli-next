@@ -43,7 +43,7 @@ const MobileDock = () => {
 	const pathname = usePathname();
 	const { focusPageId } = useFocusMode();
 
-	if (focusPageId) {
+	if (focusPageId || pathname.startsWith('/job/')) {
 		return null;
 	}
 
